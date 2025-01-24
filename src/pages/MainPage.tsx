@@ -15,19 +15,19 @@ import { Link } from "react-router-dom";
 const MainPage = () => {
   const [visible, setVisible] = useState<boolean>(false);
 
-  const openAndCloseTab = () => {
-    const newTab = window.open(
-      "https://qmeup.westlakemed.com.ph:9096/signin",
-      "_blank"
-    );
+  // const openAndCloseTab = () => {
+  //   const newTab = window.open(
+  //     "https://qmeup.westlakemed.com.ph:9096/signin",
+  //     "_blank"
+  //   );
 
-    if (newTab) {
-      setTimeout(() => {
-        newTab.close();
-        window.history.back();
-      }, 5000);
-    }
-  };
+  //   if (newTab) {
+  //     setTimeout(() => {
+  //       newTab.close();
+  //       window.history.back();
+  //     }, 5000);
+  //   }
+  // };
 
   return (
     <PageTemplate>
@@ -56,12 +56,17 @@ const MainPage = () => {
                 </p>
               </Card>
             </Link>
-            <Card
+            <Link to={"/qmeup"}>
+              <Card className="border w-44 h-44 bg-slate-900/40 border-slate-700 backdrop-blur-sm hover:shadow hover:shadow-blue-400">
+                <p className="text-lg font-medium text-slate-100">Open QMEUP</p>
+              </Card>
+            </Link>
+            {/* <Card
               className="border cursor-pointer w-44 h-44 bg-slate-900/40 border-slate-700 backdrop-blur-sm hover:shadow hover:shadow-blue-400"
               onClick={openAndCloseTab}
             >
               <p className="text-lg font-medium text-slate-100">Open QMEUP</p>
-            </Card>
+            </Card> */}
           </div>
         </div>
       </div>
