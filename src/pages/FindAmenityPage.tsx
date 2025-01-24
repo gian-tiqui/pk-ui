@@ -1,7 +1,6 @@
 import { useState } from "react";
 import PageTemplate from "../templates/PageTemplate";
 import { Dialog } from "primereact/dialog";
-import { PrimeIcons } from "primereact/api";
 import { useNavigate } from "react-router-dom";
 
 // new branch
@@ -117,7 +116,12 @@ const FindAmenityPage = () => {
             <h4 className="mb-6 text-2xl font-medium text-slate-100">
               Find an amenity in our hospital.
             </h4>
-            <i onClick={() => navigate(-1)} className={PrimeIcons.TIMES}></i>
+            <div
+              onClick={() => navigate(-1)}
+              className="grid w-8 h-8 rounded-full hover:bg-slate-100 hover:text-slate-900 place-content-center"
+            >
+              <i className={`pi pi-arrow-circle-left text-2xl`}></i>
+            </div>
           </div>
 
           <div className="flex flex-col gap-2">
