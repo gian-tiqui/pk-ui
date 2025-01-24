@@ -3,6 +3,7 @@ import { Route as RouteType } from "../types/types";
 import LandingPage from "../pages/LandingPage";
 import MainPage from "../pages/MainPage";
 import FindAmenityPage from "../pages/FindAmenityPage";
+import QMEUP from "../pages/QMEUP";
 
 const RouteProvider = () => {
   const routes: RouteType[] = [
@@ -23,6 +24,12 @@ const RouteProvider = () => {
       hidden: false,
       path: "/find-amenity",
       element: <FindAmenityPage />,
+    },
+    {
+      name: "QMEUP",
+      hidden: false,
+      path: "/qmeup",
+      element: <QMEUP />,
     },
   ];
 
