@@ -7,4 +7,13 @@ type Route = {
   hidden: boolean;
 };
 
-export type { Route };
+type UserData = {
+  sub: number;
+  firstName: string;
+  lastName: string;
+  deptId: number;
+  deptName: string;
+  deptCode: string;
+};
+
+export type { Route, UserData };

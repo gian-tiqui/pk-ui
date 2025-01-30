@@ -3,8 +3,6 @@ import PageTemplate from "../templates/PageTemplate";
 import { Dialog } from "primereact/dialog";
 import { useNavigate } from "react-router-dom";
 
-// new branch
-
 const FindAmenityPage = () => {
   const navigate = useNavigate();
 
@@ -125,8 +123,8 @@ const FindAmenityPage = () => {
           </div>
 
           <div className="flex flex-col gap-2">
-            {floors.map((floor) => (
-              <div>
+            {floors.map((floor, index) => (
+              <div key={index}>
                 <p className="mb-4 text-2xl font-medium">{floor.name}</p>
                 <div className="flex flex-wrap gap-2">
                   {floor.rooms.map((room, index) => (
