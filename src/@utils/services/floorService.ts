@@ -5,7 +5,9 @@ import apiClient from "../http-common/apiClient";
 const getFloors = async (query: Query) => {
   try {
     const response = await apiClient.get(
-      `${URI.API_URI}/api/v1/floor?search=${query.search}`
+      `${URI.API_URI}/api/v1/floor?search=${query.search}&limit=${
+        query.limit || 10
+      }`
     );
 
     if (response.status === 200) {
