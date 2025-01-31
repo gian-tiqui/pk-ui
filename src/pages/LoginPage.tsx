@@ -10,10 +10,11 @@ import { useForm } from "react-hook-form";
 import { Namespace, URI } from "../@utils/enums/enum";
 import apiClient from "../@utils/http-common/apiClient";
 import { Toast } from "primereact/toast";
-import handleLoginError from "../@utils/functions/handleLoginErrors";
+import handleLoginError from "../@utils/functions/handleErrors";
 import Cookies from "js-cookie";
 import useLoggedInStore from "../@utils/store/loggedIn";
 import isAuthenticated from "../@utils/functions/isAuthenticated";
+import { jwtDecode } from "jwt-decode";
 
 interface FormFields {
   employeeId: string;
@@ -55,7 +56,16 @@ const LoginPage = () => {
 
         if (accessToken && refreshToken) {
           localStorage.setItem(Namespace.BASE, accessToken);
-          Cookies.set(Namespace.BASE, refreshToken);
+
+          const { exp } = jwtDecode(refreshToken);
+
+          const currentTimestamp = Math.floor(Date.now() / 1000);
+
+          if (!exp) return;
+
+          const expires = Math.floor((exp - currentTimestamp) / (60 * 60 * 24));
+
+          Cookies.set(Namespace.BASE, refreshToken, { expires });
           setIsLoggedIn(true);
 
           navigate("/amemity-management");

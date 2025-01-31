@@ -32,14 +32,14 @@ apiClient.interceptors.request.use(
         const refreshToken = Cookies.get(Namespace.BASE);
 
         const response = await axios.post(
-          `${apiUri}/auth/refresh`,
+          `${apiUri}/api/v1/auth/refresh`,
           { refreshToken },
           {
             withCredentials: true,
           }
         );
 
-        accessToken = response.data.access_token;
+        accessToken = response.data.accessToken;
 
         if (!accessToken || accessToken === undefined) {
           Cookies.remove(Namespace.BASE);
@@ -78,15 +78,15 @@ apiClient.interceptors.response.use(
       try {
         const refreshToken = Cookies.get(Namespace.BASE);
         const response = await axios.post(
-          `${apiUri}/auth/refresh`,
+          `${apiUri}api/v1/auth/refresh`,
           { refreshToken },
           { withCredentials: true }
         );
 
-        const { access_token } = response.data;
-        localStorage.setItem(Namespace.BASE, access_token);
+        const { accessToken } = response.data;
+        localStorage.setItem(Namespace.BASE, accessToken);
 
-        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
         console.error("Refresh token failed:", refreshError);
