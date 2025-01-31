@@ -69,8 +69,9 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
     isError,
     isLoading,
   } = useQuery({
-    queryKey: [`floors-${query}`],
+    queryKey: [`floors-${JSON.stringify(query)}`],
     queryFn: () => getFloors(query),
+    // staleTime: 1000 * 60 * 2,
   });
 
   useEffect(() => {
@@ -100,7 +101,7 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
         <InputText
           placeholder="Search"
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="h-10 border-slate-700 bg-inherit text-slate-100"
+          className="h-10 border-slate-700 bg-slate-800 text-slate-100"
         />
       </IconField>
       <div className="flex items-center justify-between h-10 mx-5">

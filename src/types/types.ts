@@ -53,4 +53,9 @@ type Floor = {
   updatedAt: Date;
 };
 
-export type { Route, UserData, Query, Floor, Room };
+type SettingsPanel = {
+  header: string;
+  panel: ReactNode;
+};
+
+export type { Route, UserData, Query, Floor, Room, SettingsPanel };

@@ -11,10 +11,9 @@ const FloorItem: React.FC<
 > = ({ code, name, id, selectedId, setSelectedId }) => {
   return (
     <Button
-      key={id}
       onClick={() => setSelectedId(id)}
-      className={`flex w-full h-12 gap-2 mb-2 text-sm border-none bg-inherit  ${
-        id === selectedId ? "bg-gray-700" : "hover:bg-gray-800"
+      className={`flex w-full h-12 gap-2 mb-2 text-sm border-none  ${
+        id === selectedId ? "bg-gray-700" : "bg-inherit hover:bg-gray-800"
       }`}
       severity="contrast"
     >
