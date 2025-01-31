@@ -1,10 +1,12 @@
 import { Toast } from "primereact/toast";
 import { MutableRefObject } from "react";
 
-const handleLoginError = (
+const handleErrors = (
   error: unknown,
   refObject: MutableRefObject<Toast | null>
 ) => {
+  console.log(error);
+
   const {
     response: {
       data: { message, error: err },
@@ -40,4 +42,4 @@ const handleLoginError = (
   });
 };
 
-export default handleLoginError;
+export default handleErrors;
