@@ -3,9 +3,16 @@ import PageTemplate from "../templates/PageTemplate";
 import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
 import HiddenLoginButton from "../components/HiddenLoginButton";
+import useLoggedInStore from "../@utils/store/loggedIn";
+import { useEffect } from "react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useLoggedInStore();
+
+  useEffect(() => {
+    if (isLoggedIn) navigate("/amenity-management");
+  }, [isLoggedIn, navigate]);
 
   return (
     <PageTemplate>

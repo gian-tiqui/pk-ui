@@ -7,10 +7,13 @@ import apiClient from "../@utils/http-common/apiClient";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { useNavigate } from "react-router-dom";
 import useLoggedInStore from "../@utils/store/loggedIn";
+import { useState } from "react";
+import SettingsDialog from "./UserSettingsDialog";
 
 const CrmSidebarFooter = () => {
   const navigate = useNavigate();
-  const { user } = useUserDataStore();
+  const [visible, setVisible] = useState<boolean>(false);
+  const { user, remove } = useUserDataStore();
   const { setIsLoggedIn } = useLoggedInStore();
   const accept = async () => {
     try {
@@ -33,6 +36,7 @@ const CrmSidebarFooter = () => {
 
       if (response.status === 200) {
         setIsLoggedIn(false);
+        remove();
         Cookies.remove(Namespace.BASE);
         localStorage.removeItem(Namespace.BASE);
         navigate("/");
@@ -56,17 +60,26 @@ const CrmSidebarFooter = () => {
     <footer className="flex flex-col gap-2 mx-5">
       <ConfirmDialog
         pt={{
-          header: { className: "bg-slate-900 text-slate-100" },
-          content: { className: "bg-slate-900 text-slate-100" },
-          footer: { className: "bg-slate-900" },
+          header: {
+            className:
+              "bg-slate-900 text-slate-100 border-x border-t border-slate-700",
+          },
+          content: {
+            className: "bg-slate-900 text-slate-100 border-x border-slate-700",
+          },
+          footer: {
+            className: "bg-slate-900 border-x border-b border-slate-700",
+          },
         }}
       />
+      <SettingsDialog visible={visible} setVisible={setVisible} />
       <Button
         className="w-full h-12 text-sm border-none bg-inherit hover:bg-gray-800"
         severity="contrast"
         icon={`${PrimeIcons.COG} text-sm me-2`}
+        onClick={() => setVisible(true)}
       >
-        Settings
+        Account Settings
       </Button>
       <Button
         onClick={handleLogoutClicked}

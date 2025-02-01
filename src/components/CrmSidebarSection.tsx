@@ -5,7 +5,13 @@ import { InputText } from "primereact/inputtext";
 import { ScrollPanel } from "primereact/scrollpanel";
 import FloorItem from "./FloorItem";
 import { useQuery } from "@tanstack/react-query";
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { getFloors } from "../@utils/services/floorService";
 import { Query } from "../types/types";
 import useCrmSidebarSignalStore from "../@utils/store/crmSidebarSectionSignal";
@@ -19,6 +25,43 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [query, setQuery] = useState<Query>({});
   const { refresh, setRefresh } = useCrmSidebarSignalStore();
+  const scrollPanelRef = useRef<ScrollPanel>(null);
+
+  const handleScroll = () => {
+    if (scrollPanelRef.current) {
+      const content = scrollPanelRef.current.getContent();
+      if (content) {
+        const { scrollTop, scrollHeight, clientHeight } = content;
+        if (scrollTop + clientHeight >= scrollHeight - 1) {
+          setQuery((prevQuery) => {
+            if (prevQuery.limit) {
+              return {
+                ...prevQuery,
+                limit: prevQuery.limit + 10,
+              };
+            }
+
+            return {
+              ...prevQuery,
+              limit: 20,
+            };
+          });
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    const content = scrollPanelRef.current?.getContent();
+    if (content) {
+      content.addEventListener("scroll", handleScroll);
+    }
+    return () => {
+      if (content) {
+        content.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, []);
 
   const {
     data: floors,
@@ -26,13 +69,13 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
     isError,
     isLoading,
   } = useQuery({
-    queryKey: [`floors-${query}`],
+    queryKey: [`floors-${JSON.stringify(query)}`],
     queryFn: () => getFloors(query),
+    // staleTime: 1000 * 60 * 2,
   });
 
   useEffect(() => {
     if (refresh === true) {
-      console.log("refetched");
       refetch();
     }
 
@@ -58,7 +101,7 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
         <InputText
           placeholder="Search"
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="h-10 border-slate-700 bg-inherit text-slate-100"
+          className="h-10 border-slate-700 bg-slate-800 text-slate-100"
         />
       </IconField>
       <div className="flex items-center justify-between h-10 mx-5">
@@ -72,6 +115,7 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
         </div>
       </div>
       <ScrollPanel
+        ref={scrollPanelRef}
         className={`pb-36 ms-5 ${
           floors && floors?.length > 6 ? "me-1" : "me-5"
         }`}

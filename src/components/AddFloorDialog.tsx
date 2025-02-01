@@ -88,7 +88,7 @@ const AddFloorDialog: React.FC<Props> = ({ visible, onHide, setVisible }) => {
           },
           content: {
             className:
-              "bg-slate-900 text-slate-100 pt-5 border-x border-slate-700 shadow-sm shadow-blue-400",
+              "bg-slate-900 text-slate-100 pt-5 border-x border-slate-700",
           },
         }}
       >

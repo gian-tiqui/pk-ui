@@ -15,6 +15,8 @@ import Cookies from "js-cookie";
 import useLoggedInStore from "../@utils/store/loggedIn";
 import isAuthenticated from "../@utils/functions/isAuthenticated";
 import { jwtDecode } from "jwt-decode";
+import useUserDataStore from "../@utils/store/userDataStore";
+import extractUserData from "../@utils/functions/extractUserData";
 
 interface FormFields {
   employeeId: string;
@@ -24,6 +26,7 @@ interface FormFields {
 const LoginPage = () => {
   const [isActive, setIsActive] = useState<boolean>(true);
   const { setIsLoggedIn } = useLoggedInStore();
+  const { setUser } = useUserDataStore();
   const navigate = useNavigate();
   const {
     register,
@@ -47,11 +50,6 @@ const LoginPage = () => {
       );
 
       if (response.status === 201) {
-        toastRef.current?.show({
-          severity: "info",
-          summary: "Login Successful",
-        });
-
         const { accessToken, refreshToken } = response.data.tokens;
 
         if (accessToken && refreshToken) {
@@ -66,7 +64,25 @@ const LoginPage = () => {
           const expires = Math.floor((exp - currentTimestamp) / (60 * 60 * 24));
 
           Cookies.set(Namespace.BASE, refreshToken, { expires });
+
+          const userData = extractUserData();
+
+          if (!userData) {
+            toastRef.current?.show({
+              severity: "error",
+              summary: "There was a problem in ",
+            });
+
+            return;
+          }
+
+          setUser(userData);
           setIsLoggedIn(true);
+
+          toastRef.current?.show({
+            severity: "info",
+            summary: "Login Successful",
+          });
 
           navigate("/amemity-management");
         }
