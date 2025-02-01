@@ -51,8 +51,9 @@ const SettingsDialog: React.FC<Props> = ({ visible, setVisible }) => {
           tab: { className: "w-full bg-inherit" },
         }}
       >
-        {settingsPanels.map((settingsPanel) => (
+        {settingsPanels.map((settingsPanel, index) => (
           <TabPanel
+            key={index}
             header={settingsPanel.header}
             className="text-slate-100"
             pt={{ headerAction: { className: "bg-inherit" } }}

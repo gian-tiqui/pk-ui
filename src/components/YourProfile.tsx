@@ -8,36 +8,22 @@ import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { ScrollPanel } from "primereact/scrollpanel";
 import { Toast } from "primereact/toast";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Query } from "../types/types";
 import { useQuery } from "@tanstack/react-query";
 import { getDepartments } from "../@utils/services/departmentService";
 
 const SettingsDetail = () => {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedDepartment, setSelectedDepartment] = useState<string>();
-  const [query, setQuery] = useState<Query>({});
+
   const { handleSubmit } = useForm();
   const toastRef = useRef<Toast>(null);
 
   const { data: departments } = useQuery({
-    queryKey: [`departments-${JSON.stringify(query)}`],
-    queryFn: () => getDepartments(query),
+    queryKey: [`departments-dropdown`],
+    queryFn: () => getDepartments({ search: "" }),
   });
-
-  useEffect(() => {
-    console.log(query);
-  }, [query]);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setQuery({ search: searchTerm });
-    }, 400);
-
-    return () => clearTimeout(handler);
-  }, [searchTerm]);
 
   const accept = () => {
     setIsEditMode(false);
@@ -53,33 +39,23 @@ const SettingsDetail = () => {
     });
   };
 
-  const selectedCountryTemplate = (option, props) => {
+  const selectedDepartmentTemplate = (option, props) => {
     if (option) {
       return (
-        <div className="flex align-items-center">
-          <img
-            alt={option.name}
-            src="https://primefaces.org/cdn/primereact/images/flag/flag_placeholder.png"
-            className={`mr-2 flag flag-${option.code.toLowerCase()}`}
-            style={{ width: "18px" }}
-          />
+        <div className="flex w-full gap-2">
+          <div>{option.code}</div>
           <div>{option.name}</div>
         </div>
       );
     }
 
-    return <span>{props.placeholder}</span>;
+    return <span className="bg-slate-800">{props.placeholder}</span>;
   };
 
-  const countryOptionTemplate = (option) => {
+  const departmentOptionTemplate = (option) => {
     return (
-      <div className="flex align-items-center">
-        <img
-          alt={option.name}
-          src="https://primefaces.org/cdn/primereact/images/flag/flag_placeholder.png"
-          className={`mr-2 flag flag-${option.code.toLowerCase()}`}
-          style={{ width: "18px" }}
-        />
+      <div className="flex w-full gap-2">
+        <div>{option.code}</div>
         <div>{option.name}</div>
       </div>
     );
@@ -134,6 +110,15 @@ const SettingsDetail = () => {
         <div className="flex justify-between w-full">
           <p className="w-full">Department</p>
           <Dropdown
+            pt={{
+              header: { className: "bg-slate-800" },
+              filterInput: { className: "bg-inherit text-slate-100" },
+              list: { className: "bg-slate-800" },
+              item: {
+                className:
+                  "text-slate-100 focus:bg-slate-700 focus:text-slate-100",
+              },
+            }}
             disabled={!isEditMode}
             className="w-full h-12 bg-inherit border-slate-400"
             value={selectedDepartment}
@@ -142,12 +127,12 @@ const SettingsDetail = () => {
             optionLabel="name"
             placeholder="Select a department"
             filter
-            valueTemplate={selectedCountryTemplate}
-            itemTemplate={countryOptionTemplate}
+            valueTemplate={selectedDepartmentTemplate}
+            itemTemplate={departmentOptionTemplate}
           />
+
           <div className="w-full"></div>
         </div>
-        <Divider />
       </ScrollPanel>
       <div className="flex justify-end gap-2">
         {isEditMode && (
