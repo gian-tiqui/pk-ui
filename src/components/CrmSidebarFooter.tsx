@@ -13,7 +13,7 @@ import SettingsDialog from "./UserSettingsDialog";
 const CrmSidebarFooter = () => {
   const navigate = useNavigate();
   const [visible, setVisible] = useState<boolean>(false);
-  const { user } = useUserDataStore();
+  const { user, remove } = useUserDataStore();
   const { setIsLoggedIn } = useLoggedInStore();
   const accept = async () => {
     try {
@@ -36,6 +36,7 @@ const CrmSidebarFooter = () => {
 
       if (response.status === 200) {
         setIsLoggedIn(false);
+        remove();
         Cookies.remove(Namespace.BASE);
         localStorage.removeItem(Namespace.BASE);
         navigate("/");

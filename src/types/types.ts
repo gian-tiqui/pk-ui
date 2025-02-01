@@ -10,6 +10,7 @@ type Route = {
 type UserData = {
   sub: number;
   firstName: string;
+  middleName?: string;
   lastName: string;
   deptId: number;
   deptName: string;
@@ -58,4 +59,26 @@ type SettingsPanel = {
   panel: ReactNode;
 };
 
-export type { Route, UserData, Query, Floor, Room, SettingsPanel };
+type User = {
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  deptId: number;
+};
+
+type ChangePassword = {
+  oldPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+};
+
+export type {
+  Route,
+  UserData,
+  Query,
+  Floor,
+  Room,
+  SettingsPanel,
+  User,
+  ChangePassword,
+};

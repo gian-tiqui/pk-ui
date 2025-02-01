@@ -3,6 +3,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import React, { Dispatch, SetStateAction } from "react";
 import { SettingsPanel } from "../types/types";
 import SettingsDetail from "./YourProfile";
+import ChangePassword from "./ChangePassword";
 
 interface Props {
   visible: boolean;
@@ -17,7 +18,7 @@ const SettingsDialog: React.FC<Props> = ({ visible, setVisible }) => {
     },
     {
       header: "Change Password",
-      panel: null,
+      panel: <ChangePassword />,
     },
     {
       header: "Recovery Method",

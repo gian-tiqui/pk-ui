@@ -2,23 +2,57 @@ import { PrimeIcons } from "primereact/api";
 import { Button } from "primereact/button";
 import { confirmDialog } from "primereact/confirmdialog";
 import { Divider } from "primereact/divider";
-import { Dropdown } from "primereact/dropdown";
+import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { ScrollPanel } from "primereact/scrollpanel";
 import { Toast } from "primereact/toast";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import { getDepartments } from "../@utils/services/departmentService";
+import useUserDataStore from "../@utils/store/userDataStore";
+import { updateUserById } from "../@utils/services/userService";
+import { User } from "../types/types";
+import { refresh } from "../@utils/services/authService";
+import { Namespace } from "../@utils/enums/enum";
+import extractUserData from "../@utils/functions/extractUserData";
+import handleErrors from "../@utils/functions/handleErrors";
 
 const SettingsDetail = () => {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [selectedDepartment, setSelectedDepartment] = useState<string>();
-
-  const { handleSubmit } = useForm();
+  const [selectedDeptId, setSelectedDeptId] = useState<number>();
+  const { user, setUser } = useUserDataStore();
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useForm<User>();
   const toastRef = useRef<Toast>(null);
+
+  useEffect(() => {
+    const setUserDetails = () => {
+      if (user?.firstName) setValue("firstName", user.firstName);
+      if (user?.middleName) setValue("middleName", user.middleName);
+      if (user?.lastName) setValue("lastName", user.lastName);
+      if (user?.deptId) setValue("deptId", user.deptId);
+    };
+
+    setUserDetails();
+  }, [user, setValue]);
+
+  useEffect(() => {
+    const changeFormDeptId = () => {
+      if (selectedDeptId) {
+        setValue("deptId", selectedDeptId);
+      }
+    };
+
+    changeFormDeptId();
+  }, [selectedDeptId, setValue]);
 
   const { data: departments } = useQuery({
     queryKey: [`departments-dropdown`],
@@ -26,12 +60,46 @@ const SettingsDetail = () => {
   });
 
   const accept = () => {
-    setIsEditMode(false);
+    if (user?.sub) {
+      updateUserById(user?.sub, { ...getValues() })
+        .then((response) => {
+          if (response.status === 200) {
+            refresh()
+              .then((response) => {
+                if (response.status === 201) {
+                  const { accessToken } = response.data;
+
+                  localStorage.setItem(Namespace.BASE, accessToken);
+
+                  const newUserData = extractUserData();
+
+                  if (newUserData) {
+                    setUser(newUserData);
+
+                    toastRef.current?.show({
+                      severity: "info",
+                      summary: "Success",
+                      detail: "Your profile has been updated successfully.",
+                    });
+
+                    setIsEditMode(false);
+                  } else {
+                    console.error(
+                      "There was a problem in updating your profile"
+                    );
+                  }
+                }
+              })
+              .catch((error) => handleErrors(error, toastRef));
+          }
+        })
+        .catch((error) => handleErrors(error, toastRef));
+    }
   };
 
   const onSubmit = () => {
     confirmDialog({
-      message: "Do you want save the changes?",
+      message: "Do you want to save the changes?",
       header: "Update profile",
       icon: PrimeIcons.QUESTION_CIRCLE,
       defaultFocus: "reject",
@@ -39,7 +107,10 @@ const SettingsDetail = () => {
     });
   };
 
-  const selectedDepartmentTemplate = (option, props) => {
+  const selectedDepartmentTemplate = (
+    option: { code: string; name: string },
+    props: DropdownProps
+  ) => {
     if (option) {
       return (
         <div className="flex w-full gap-2">
@@ -52,7 +123,7 @@ const SettingsDetail = () => {
     return <span className="bg-slate-800">{props.placeholder}</span>;
   };
 
-  const departmentOptionTemplate = (option) => {
+  const departmentOptionTemplate = (option: { code: string; name: string }) => {
     return (
       <div className="flex w-full gap-2">
         <div>{option.code}</div>
@@ -70,12 +141,20 @@ const SettingsDetail = () => {
           <IconField iconPosition="left" className="w-full">
             <InputIcon className={PrimeIcons.USER}> </InputIcon>
             <InputText
+              {...register("firstName", { required: true })}
               disabled={!isEditMode}
               placeholder="Jonathan"
-              className="w-full h-10 bg-inherit"
+              className="w-full h-10 bg-inherit text-slate-100"
             />
           </IconField>
-          <div className="w-full"></div>
+          <div className="flex items-center justify-end w-full">
+            {errors.firstName && (
+              <div className="flex items-center gap-2 text-red-500">
+                <i className={`${PrimeIcons.EXCLAMATION_CIRCLE}`}></i>
+                <small>First name is required.</small>
+              </div>
+            )}
+          </div>
         </div>
         <Divider />
 
@@ -84,9 +163,10 @@ const SettingsDetail = () => {
           <IconField iconPosition="left" className="w-full">
             <InputIcon className={PrimeIcons.USER}> </InputIcon>
             <InputText
+              {...register("middleName")}
               disabled={!isEditMode}
               placeholder="Jason"
-              className="w-full h-10 bg-inherit"
+              className="w-full h-10 bg-inherit text-slate-100"
             />
           </IconField>
           <div className="w-full"></div>
@@ -98,38 +178,60 @@ const SettingsDetail = () => {
           <IconField iconPosition="left" className="w-full">
             <InputIcon className={PrimeIcons.USER}> </InputIcon>
             <InputText
+              {...register("lastName", { required: true })}
               disabled={!isEditMode}
               placeholder="Ric"
-              className="w-full h-10 bg-inherit"
+              className="w-full h-10 bg-inherit text-slate-100"
             />
           </IconField>
-          <div className="w-full"></div>
+          <div className="flex items-center justify-end w-full">
+            {errors.lastName && (
+              <div className="flex items-center gap-2 text-red-500">
+                <i className={`${PrimeIcons.EXCLAMATION_CIRCLE}`}></i>
+                <small className="text-red-400">Last name is required.</small>
+              </div>
+            )}
+          </div>
         </div>
         <Divider />
 
         <div className="flex justify-between w-full">
           <p className="w-full">Department</p>
-          <Dropdown
-            pt={{
-              header: { className: "bg-slate-800" },
-              filterInput: { className: "bg-inherit text-slate-100" },
-              list: { className: "bg-slate-800" },
-              item: {
-                className:
-                  "text-slate-100 focus:bg-slate-700 focus:text-slate-100",
-              },
-            }}
-            disabled={!isEditMode}
-            className="w-full h-12 bg-inherit border-slate-400"
-            value={selectedDepartment}
-            onChange={(e) => setSelectedDepartment(e.value)}
-            options={departments}
-            optionLabel="name"
-            placeholder="Select a department"
-            filter
-            valueTemplate={selectedDepartmentTemplate}
-            itemTemplate={departmentOptionTemplate}
-          />
+          {isEditMode ? (
+            <Dropdown
+              pt={{
+                header: { className: "bg-slate-800" },
+                filterInput: { className: "bg-inherit text-slate-100" },
+                list: { className: "bg-slate-800" },
+                item: {
+                  className:
+                    "text-slate-100 focus:bg-slate-700 focus:text-slate-100",
+                },
+              }}
+              disabled={!isEditMode}
+              className="w-full h-12 bg-inherit border-slate-400"
+              value={selectedDeptId}
+              onChange={(e) => {
+                setSelectedDeptId(e.value.id);
+              }}
+              options={departments}
+              optionLabel="name"
+              placeholder="Select a department"
+              filter
+              valueTemplate={selectedDepartmentTemplate}
+              itemTemplate={departmentOptionTemplate}
+            />
+          ) : (
+            <IconField iconPosition="left" className="w-full">
+              <InputIcon className={PrimeIcons.BUILDING}> </InputIcon>
+              <InputText
+                value={user?.deptName}
+                disabled={!isEditMode}
+                placeholder="Ric"
+                className="w-full h-10 bg-inherit text-slate-100"
+              />
+            </IconField>
+          )}
 
           <div className="w-full"></div>
         </div>

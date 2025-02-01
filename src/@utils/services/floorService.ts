@@ -23,8 +23,6 @@ const getFloors = async (query: Query) => {
 };
 
 const createFloor = async (name: string, code: string, level: number) => {
-  console.log("Sending request to create floor:", { name, code, level });
-
   const parseLevel = Number(level);
 
   return apiClient.post(`${URI.API_URI}/api/v1/floor`, {
