@@ -2,18 +2,18 @@ import { Query } from "../../types/types";
 import { URI } from "../enums/enum";
 import apiClient from "../http-common/apiClient";
 
-const getDepartments = async (query?: Query) => {
+const getSecretQuestions = async (query?: Query) => {
   try {
     const response = await apiClient.get(
-      `${URI.API_URI}/api/v1/department?search=${query?.search || ""}&limit=${
-        query?.limit || 50
-      }`
+      `${URI.API_URI}/api/v1/secret-question?search=${
+        query?.search || ""
+      }&limit=${50}`
     );
 
     if (response.status === 200) {
-      const departments = response.data.departments;
+      const questions = response.data.secretQuestions;
 
-      return departments;
+      return questions;
     }
   } catch (error) {
     console.error(error);
@@ -22,4 +22,4 @@ const getDepartments = async (query?: Query) => {
   }
 };
 
-export { getDepartments };
+export { getSecretQuestions };

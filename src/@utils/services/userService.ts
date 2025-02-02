@@ -6,6 +6,10 @@ const getUser = async (id: number) => {
   return apiClient.get(`${URI.API_URI}/api/v1/user/${id}`);
 };
 
+const getUserSecret = async (id: number) => {
+  return apiClient.get(`${URI.API_URI}/api/v1/user/${id}/secret`);
+};
+
 const updateUserById = async (
   userId: number,
   { firstName, middleName, lastName, deptId }: User
@@ -28,4 +32,20 @@ const changePassword = async (
   );
 };
 
-export { getUser, updateUserById, changePassword };
+const updateUserSecretById = async (
+  userId: number,
+  questionId: number,
+  answer: string
+) => {
+  return apiClient.patch(
+    `${URI.API_URI}/api/v1/user/${userId}/update-secret?questionId=${questionId}&answer=${answer}`
+  );
+};
+
+export {
+  getUser,
+  updateUserById,
+  changePassword,
+  getUserSecret,
+  updateUserSecretById,
+};

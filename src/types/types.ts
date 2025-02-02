@@ -57,6 +57,7 @@ type Floor = {
 type SettingsPanel = {
   header: string;
   panel: ReactNode;
+  icon: string;
 };
 
 type User = {
@@ -72,13 +73,26 @@ type ChangePassword = {
   confirmNewPassword: string;
 };
 
+type Department = {
+  id: number;
+  name: string;
+  code: string;
+};
+
+type Question = {
+  id: number;
+  question: string;
+};
+
 export type {
   Route,
   UserData,
   Query,
   Floor,
   Room,
+  Question,
   SettingsPanel,
   User,
   ChangePassword,
+  Department,
 };
