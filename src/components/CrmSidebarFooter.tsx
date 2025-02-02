@@ -7,14 +7,38 @@ import apiClient from "../@utils/http-common/apiClient";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { useNavigate } from "react-router-dom";
 import useLoggedInStore from "../@utils/store/loggedIn";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SettingsDialog from "./UserSettingsDialog";
+import { getUserSecret } from "../@utils/services/userService";
+import { Toast } from "primereact/toast";
+import handleErrors from "../@utils/functions/handleErrors";
+import { Dialog } from "primereact/dialog";
+import useHasSecretStore from "../@utils/store/userHasSecret";
 
 const CrmSidebarFooter = () => {
   const navigate = useNavigate();
-  const [visible, setVisible] = useState<boolean>(false);
+  const [settingsDialogVisible, setSettingsDialogVisible] =
+    useState<boolean>(false);
+  const [noSecretDialogVisible, setNoSecretDialogVisible] =
+    useState<boolean>(false);
   const { user, remove } = useUserDataStore();
   const { setIsLoggedIn } = useLoggedInStore();
+  const { hasSecret, setHasSecret } = useHasSecretStore();
+  const toastRef = useRef<Toast>(null);
+
+  useEffect(() => {
+    if (user) {
+      getUserSecret(user?.sub)
+        .then((res) => {
+          if (res.data.secret === "none") {
+            setNoSecretDialogVisible(true);
+            setHasSecret(false);
+          }
+        })
+        .catch((err) => handleErrors(err, toastRef));
+    }
+  }, [user, setHasSecret]);
+
   const accept = async () => {
     try {
       const refreshToken = Cookies.get(Namespace.BASE);
@@ -57,39 +81,89 @@ const CrmSidebarFooter = () => {
   };
 
   return (
-    <footer className="flex flex-col gap-2 mx-5">
-      <ConfirmDialog
+    <>
+      <Toast ref={toastRef} />
+      <Dialog
         pt={{
           header: {
             className:
               "bg-slate-900 text-slate-100 border-x border-t border-slate-700",
           },
           content: {
-            className: "bg-slate-900 text-slate-100 border-x border-slate-700",
-          },
-          footer: {
-            className: "bg-slate-900 border-x border-b border-slate-700",
+            className:
+              "bg-slate-900 text-slate-100 border-x border-b border-slate-700",
           },
         }}
-      />
-      <SettingsDialog visible={visible} setVisible={setVisible} />
-      <Button
-        className="w-full h-12 text-sm border-none bg-inherit hover:bg-gray-800"
-        severity="contrast"
-        icon={`${PrimeIcons.COG} text-sm me-2`}
-        onClick={() => setVisible(true)}
+        visible={noSecretDialogVisible}
+        onHide={() => {
+          if (hasSecret === false) {
+            toastRef.current?.show({
+              severity: "error",
+              summary: "No secret",
+              detail: "Please set your secrets first",
+            });
+            return;
+          }
+          if (noSecretDialogVisible === true) setNoSecretDialogVisible(false);
+        }}
+        className="w-96"
+        header="Recovery Method Not Set"
       >
-        Account Settings
-      </Button>
-      <Button
-        onClick={handleLogoutClicked}
-        className="w-full h-12 text-sm border-none bg-inherit hover:bg-gray-800"
-        severity="contrast"
-        icon={`${PrimeIcons.SIGN_OUT} text-sm me-2`}
-      >
-        Logout
-      </Button>
-    </footer>
+        <p className="mb-5">
+          Looks like you have not set your secret question and answer for your
+          account recovery.
+        </p>
+
+        <div className="flex justify-end w-full">
+          <Button
+            className="h-10"
+            onClick={() => {
+              setNoSecretDialogVisible(false);
+              setSettingsDialogVisible(true);
+            }}
+          >
+            Set secrets
+          </Button>
+        </div>
+      </Dialog>
+      <footer className="flex flex-col gap-2 mx-5">
+        <ConfirmDialog
+          pt={{
+            header: {
+              className:
+                "bg-slate-900 text-slate-100 border-x border-t border-slate-700",
+            },
+            content: {
+              className:
+                "bg-slate-900 text-slate-100 border-x border-slate-700",
+            },
+            footer: {
+              className: "bg-slate-900 border-x border-b border-slate-700",
+            },
+          }}
+        />
+        <SettingsDialog
+          visible={settingsDialogVisible}
+          setVisible={setSettingsDialogVisible}
+        />
+        <Button
+          className="w-full h-12 text-sm border-none bg-inherit hover:bg-gray-800"
+          severity="contrast"
+          icon={`${PrimeIcons.COG} text-sm me-2`}
+          onClick={() => setSettingsDialogVisible(true)}
+        >
+          Account Settings
+        </Button>
+        <Button
+          onClick={handleLogoutClicked}
+          className="w-full h-12 text-sm border-none bg-inherit hover:bg-gray-800"
+          severity="contrast"
+          icon={`${PrimeIcons.SIGN_OUT} text-sm me-2`}
+        >
+          Logout
+        </Button>
+      </footer>
+    </>
   );
 };
 

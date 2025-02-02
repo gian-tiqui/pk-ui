@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getDepartments } from "../@utils/services/departmentService";
 import useUserDataStore from "../@utils/store/userDataStore";
 import { updateUserById } from "../@utils/services/userService";
-import { User } from "../types/types";
+import { Department, User } from "../types/types";
 import { refresh } from "../@utils/services/authService";
 import { Namespace } from "../@utils/enums/enum";
 import extractUserData from "../@utils/functions/extractUserData";
@@ -22,7 +22,8 @@ import handleErrors from "../@utils/functions/handleErrors";
 
 const SettingsDetail = () => {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [selectedDeptId, setSelectedDeptId] = useState<number>();
+  const [selectedDepartment, setSelectedDepartment] =
+    useState<Department | null>(null);
   const { user, setUser } = useUserDataStore();
   const {
     handleSubmit,
@@ -46,13 +47,13 @@ const SettingsDetail = () => {
 
   useEffect(() => {
     const changeFormDeptId = () => {
-      if (selectedDeptId) {
-        setValue("deptId", selectedDeptId);
+      if (selectedDepartment) {
+        setValue("deptId", selectedDepartment.id);
       }
     };
 
     changeFormDeptId();
-  }, [selectedDeptId, setValue]);
+  }, [selectedDepartment, setValue]);
 
   const { data: departments } = useQuery({
     queryKey: [`departments-dropdown`],
@@ -202,17 +203,18 @@ const SettingsDetail = () => {
               pt={{
                 header: { className: "bg-slate-800" },
                 filterInput: { className: "bg-inherit text-slate-100" },
-                list: { className: "bg-slate-800" },
+                list: { className: "bg-slate-800 text-slate-100" },
                 item: {
                   className:
                     "text-slate-100 focus:bg-slate-700 focus:text-slate-100",
                 },
+                input: { className: "text-slate-100" },
               }}
               disabled={!isEditMode}
               className="w-full h-12 bg-inherit border-slate-400"
-              value={selectedDeptId}
+              value={selectedDepartment}
               onChange={(e) => {
-                setSelectedDeptId(e.value.id);
+                setSelectedDepartment(e.value);
               }}
               options={departments}
               optionLabel="name"
