@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import PageTemplate from "../templates/PageTemplate";
 import { useNavigate } from "react-router-dom";
+import useCrmSidebarStore from "../@utils/store/crmSidebar";
 
 const NotFoundPage = () => {
   const navigate = useNavigate();
   const [counter, setCounter] = useState<number>(7);
+  const { isExpanded, setIsExpanded } = useCrmSidebarStore();
+
+  useEffect(() => {
+    if (isExpanded) setIsExpanded(false);
+  }, [isExpanded, setIsExpanded]);
 
   useEffect(() => {
     if (counter === 0) {

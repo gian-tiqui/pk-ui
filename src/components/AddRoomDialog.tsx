@@ -1,80 +1,75 @@
 import { PrimeIcons } from "primereact/api";
 import { Button } from "primereact/button";
+import { confirmDialog } from "primereact/confirmdialog";
 import { Dialog } from "primereact/dialog";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
-import React, { Dispatch, SetStateAction, useRef } from "react";
-import { useForm } from "react-hook-form";
-import { createFloor } from "../@utils/services/floorService";
 import { Toast } from "primereact/toast";
+import React, { Dispatch, SetStateAction, useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
 import handleErrors from "../@utils/functions/handleErrors";
-import useCrmSidebarSignalStore from "../@utils/store/crmSidebarSectionSignal";
-import { confirmDialog } from "primereact/confirmdialog";
+import { useParams } from "react-router-dom";
+import { createRoom } from "../@utils/services/roomService";
+import useFloorRoomsSignalStore from "../@utils/store/floorRoomsSignal";
 
 interface Props {
   visible: boolean;
-  onHide: () => void;
   setVisible: Dispatch<SetStateAction<boolean>>;
 }
 
 interface FormFields {
   name: string;
-  level: number;
   code: string;
+  detail: string;
+  floorId: number;
 }
 
-const AddFloorDialog: React.FC<Props> = ({ visible, onHide, setVisible }) => {
+const AddRoomDialog: React.FC<Props> = ({ visible, setVisible }) => {
   const toastRef = useRef<Toast>(null);
+  const param = useParams();
+  const { setFloorRoomsSignal } = useFloorRoomsSignalStore();
+
   const {
     register,
     formState: { errors },
     handleSubmit,
     reset,
     getValues,
+    setValue,
   } = useForm<FormFields>();
-  const { setRefresh } = useCrmSidebarSignalStore();
+
+  useEffect(() => {
+    if (param.floorId) setValue("floorId", +param.floorId);
+  }, [setValue, param]);
 
   const accept = () => {
-    const { name, level, code } = getValues();
-    createFloor(name, code, level)
-      .then((response) => {
-        const message = response?.data?.message || "Floor created successfully";
-        const status = response?.status;
+    const { name, code, detail, floorId } = getValues();
 
-        if (status === 201) {
+    createRoom(name, code, detail, floorId)
+      .then((response) => {
+        if (response.status === 201) {
+          const message =
+            response?.data?.message || "Floor created successfully";
+
           toastRef.current?.show({
             severity: "info",
             summary: "Success",
             detail: message,
           });
 
-          setRefresh(true);
           reset();
+          setFloorRoomsSignal(true);
           setVisible(false);
         }
       })
-      .catch((error) => {
-        console.error("API Error:", error);
-
-        handleErrors(error, toastRef);
-
-        const status = error?.response?.status || 500;
-        const message =
-          error?.response?.data?.message || "An unknown error occurred.";
-
-        toastRef.current?.show({
-          severity: status === 400 ? "warn" : "error",
-          summary: status === 400 ? "Warning" : "Error",
-          detail: message,
-        });
-      });
+      .catch((error) => handleErrors(error, toastRef));
   };
 
-  const handleAddFloorClicked = () => {
+  const handleAddRoomClicked = () => {
     confirmDialog({
-      message: "Do you want to add this floor?",
-      header: "Create Floor",
+      message: "Do you want to add this room?",
+      header: "Create room",
       icon: PrimeIcons.QUESTION_CIRCLE,
       defaultFocus: "reject",
       accept,
@@ -88,9 +83,9 @@ const AddFloorDialog: React.FC<Props> = ({ visible, onHide, setVisible }) => {
         pt={{ content: { className: "h-full backdrop-blur" } }}
       />
       <Dialog
-        header="Add a floor"
+        header="Add a room"
         visible={visible}
-        onHide={onHide}
+        onHide={() => setVisible(false)}
         className="p-4 w-96"
         pt={{
           header: {
@@ -103,46 +98,19 @@ const AddFloorDialog: React.FC<Props> = ({ visible, onHide, setVisible }) => {
           },
         }}
       >
-        <form onSubmit={handleSubmit(handleAddFloorClicked)}>
+        <form onSubmit={handleSubmit(handleAddRoomClicked)}>
           <div className="h-24">
             <label
-              htmlFor="floorLevelInput"
+              htmlFor="roomNameInput"
               className="text-sm font-semibold text-blue-400"
             >
-              Floor level
+              Room name
             </label>
-            <IconField id="floorLevelInput" iconPosition="left">
-              <InputIcon className={`${PrimeIcons.BUILDING}`}></InputIcon>
-              <InputText
-                {...register("level", { required: true })}
-                placeholder="1"
-                type="number"
-                className="w-full bg-inherit border-slate-600 text-slate-100 hover:border-blue-400"
-              />
-            </IconField>
-            {errors.level && (
-              <small className="flex items-center gap-1 mt-1">
-                <i
-                  className={`${PrimeIcons.EXCLAMATION_CIRCLE} text-sm text-red-400`}
-                ></i>
-                <p className="font-medium text-red-400">
-                  Floor level is required.
-                </p>
-              </small>
-            )}
-          </div>
-          <div className="h-24">
-            <label
-              htmlFor="floorCodeInput"
-              className="text-sm font-semibold text-blue-400"
-            >
-              Floor name
-            </label>
-            <IconField id="floorCodeInput" iconPosition="left">
-              <InputIcon className={`${PrimeIcons.ALIGN_LEFT}`}></InputIcon>
+            <IconField id="roomNameInput" iconPosition="left">
+              <InputIcon className={`${PrimeIcons.HOME}`}></InputIcon>
               <InputText
                 {...register("name", { required: true })}
-                placeholder="First Floor"
+                placeholder="Male Comfort Room"
                 className="w-full bg-inherit border-slate-600 text-slate-100 hover:border-blue-400"
               />
             </IconField>
@@ -152,24 +120,24 @@ const AddFloorDialog: React.FC<Props> = ({ visible, onHide, setVisible }) => {
                   className={`${PrimeIcons.EXCLAMATION_CIRCLE} text-sm text-red-400`}
                 ></i>
                 <p className="font-medium text-red-400">
-                  Floor name is required.
+                  Room name is required.
                 </p>
               </small>
             )}
           </div>
           <div className="h-24">
             <label
-              htmlFor="floorCodeInput"
+              htmlFor="roomCodeInput"
               className="text-sm font-semibold text-blue-400"
             >
-              Floor code
+              Room code
             </label>
-            <IconField id="floorCodeInput" iconPosition="left">
-              <InputIcon className={`${PrimeIcons.BUILDING}`}></InputIcon>
+            <IconField id="roomCodeInput" iconPosition="left">
+              <InputIcon className={`${PrimeIcons.SHIELD}`}></InputIcon>
               <InputText
                 {...register("code", { required: true })}
-                placeholder="1F"
-                maxLength={2}
+                placeholder="MCR"
+                maxLength={5}
                 className="w-full bg-inherit border-slate-600 text-slate-100 hover:border-blue-400"
               />
             </IconField>
@@ -179,17 +147,33 @@ const AddFloorDialog: React.FC<Props> = ({ visible, onHide, setVisible }) => {
                   className={`${PrimeIcons.EXCLAMATION_CIRCLE} text-sm text-red-400`}
                 ></i>
                 <p className="font-medium text-red-400">
-                  Floor code is required.
+                  Room code is required.
                 </p>
               </small>
             )}
+          </div>
+          <div className="h-24">
+            <label
+              htmlFor="roomDetailInput"
+              className="text-sm font-semibold text-blue-400"
+            >
+              Room detail
+            </label>
+            <IconField id="roomDetailInput" iconPosition="left">
+              <InputIcon className={`${PrimeIcons.ALIGN_LEFT}`}></InputIcon>
+              <InputText
+                {...register("detail", { required: true })}
+                placeholder="Ihian ng ekalals"
+                className="w-full bg-inherit border-slate-600 text-slate-100 hover:border-blue-400"
+              />
+            </IconField>
           </div>
           <Button
             type="submit"
             className="justify-center w-full h-10 gap-2 mt-2 font-medium"
             icon={`${PrimeIcons.PLUS}`}
           >
-            Create floor
+            Create room
           </Button>
         </form>
       </Dialog>
@@ -197,4 +181,4 @@ const AddFloorDialog: React.FC<Props> = ({ visible, onHide, setVisible }) => {
   );
 };
 
-export default AddFloorDialog;
+export default AddRoomDialog;
