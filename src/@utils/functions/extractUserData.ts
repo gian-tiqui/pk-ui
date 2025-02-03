@@ -6,8 +6,6 @@ const extractUserData = (): UserData | undefined => {
   const accessToken = localStorage.getItem(Namespace.BASE);
 
   if (!accessToken) {
-    console.log(accessToken);
-    console.error("Access token is missing.");
     return;
   }
 

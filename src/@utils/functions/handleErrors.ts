@@ -17,6 +17,15 @@ const handleErrors = (
     status: number;
   };
 
+  if (status === 401) {
+    refObject.current?.show({
+      severity: "error",
+      summary: err,
+      detail: message,
+    });
+    return;
+  }
+
   if (status === 404) {
     refObject.current?.show({
       severity: "error",

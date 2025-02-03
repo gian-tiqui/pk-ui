@@ -18,8 +18,9 @@ import {
   updateUserSecretById,
 } from "../@utils/services/userService";
 import useUserDataStore from "../@utils/store/userDataStore";
-import { Question } from "../types/types";
+import { Question, Secrets } from "../types/types";
 import { confirmDialog } from "primereact/confirmdialog";
+import ClipboardDialog from "./ClipboardDialog";
 
 interface FormFields {
   questionId: number;
@@ -34,6 +35,9 @@ const RecoveryMethod = () => {
   const [selectedQuestion, setSelectedQuestion] = useState<
     Question | undefined
   >(undefined);
+  const [secrets, setSecrets] = useState<Secrets | undefined>(undefined);
+  const [clipboardDialogVisible, setClipboardDialogVisible] =
+    useState<boolean>(false);
   const {
     register,
     formState: { errors },
@@ -44,14 +48,24 @@ const RecoveryMethod = () => {
   const { user } = useUserDataStore();
 
   useEffect(() => {
+    const setClipboardVisibility = () => {
+      if (secrets) setClipboardDialogVisible(true);
+    };
+
+    setClipboardVisibility();
+  }, [secrets]);
+
+  useEffect(() => {
     const setValues = () => {
       if (user) {
         getUserSecret(user.sub)
           .then((response) => {
             if (response.data.secret === "none") return;
 
-            setValue("answer", response.data.secret.answer);
-            setValue("question", response.data.secret.question);
+            const { question, answer } = response.data.secret;
+
+            setValue("answer", answer);
+            setValue("question", question);
           })
           .catch((error) => handleErrors(error, toastRef));
       }
@@ -81,12 +95,12 @@ const RecoveryMethod = () => {
       updateUserSecretById(user.sub, questionId, answer)
         .then((response) => {
           if (response.status === 200) {
-            toastRef.current?.show({
-              severity: "info",
-              summary: "Secret updated successfully",
-              detail: "Your question and answer has been updated.",
-            });
+            const { question } = response.data.secrets;
 
+            setSecrets({
+              question,
+              answer: response.data.secrets.answer,
+            });
             setIsEditMode(false);
             setHasSecret(true);
           }
@@ -105,7 +119,7 @@ const RecoveryMethod = () => {
     });
   };
 
-  const selectedDepartmentTemplate = (
+  const selectedQuestionTemplete = (
     option: { question: string },
     props: DropdownProps
   ) => {
@@ -120,7 +134,7 @@ const RecoveryMethod = () => {
     return <span className="bg-slate-800">{props.placeholder}</span>;
   };
 
-  const departmentOptionTemplate = (option: { question: string }) => {
+  const questionOptionTemplate = (option: { question: string }) => {
     return (
       <div className="flex w-full gap-2">
         <div>{option.question}</div>
@@ -131,6 +145,11 @@ const RecoveryMethod = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full pt-5 h-80">
       <Toast ref={toastRef} />
+      <ClipboardDialog
+        secrets={secrets}
+        visible={clipboardDialogVisible}
+        onHide={setClipboardDialogVisible}
+      />
       <ScrollPanel style={{ height: "calc(72vh - 200px)" }} className="mb-5">
         <div className="flex justify-between w-full">
           <p className="w-full">Question</p>
@@ -156,8 +175,8 @@ const RecoveryMethod = () => {
               optionLabel="question"
               placeholder="Select a question"
               filter
-              valueTemplate={selectedDepartmentTemplate}
-              itemTemplate={departmentOptionTemplate}
+              valueTemplate={selectedQuestionTemplete}
+              itemTemplate={questionOptionTemplate}
             />
           ) : (
             <IconField iconPosition="left" className="w-full">

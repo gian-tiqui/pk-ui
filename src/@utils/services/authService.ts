@@ -1,6 +1,8 @@
 import Cookies from "js-cookie";
 import { Namespace, URI } from "../enums/enum";
 import apiClient from "../http-common/apiClient";
+import { ForgotPassword } from "../../types/types";
+import axios from "axios";
 
 const refresh = async () => {
   const refreshToken = Cookies.get(Namespace.BASE);
@@ -9,4 +11,23 @@ const refresh = async () => {
   });
 };
 
-export { refresh };
+const forgotPassword = async ({
+  answer,
+  employeeId,
+  questionId,
+}: ForgotPassword) => {
+  return axios.post(`${URI.API_URI}/api/v1/auth/forgot-password`, {
+    answer,
+    employeeId,
+    questionId,
+  });
+};
+
+const changePassword = async (userId: number, newPassword: string) => {
+  return apiClient.post(`${URI.API_URI}/api/v1/auth/change-password`, {
+    userId,
+    newPassword,
+  });
+};
+
+export { refresh, forgotPassword, changePassword };

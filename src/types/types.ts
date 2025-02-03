@@ -84,6 +84,14 @@ type Question = {
   question: string;
 };
 
+type Secrets = { question: string; answer: string };
+
+type ForgotPassword = {
+  employeeId: string;
+  questionId: number;
+  answer: string;
+};
+
 export type {
   Route,
   UserData,
@@ -95,4 +103,6 @@ export type {
   User,
   ChangePassword,
   Department,
+  Secrets,
+  ForgotPassword,
 };
