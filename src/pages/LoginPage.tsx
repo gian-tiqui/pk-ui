@@ -8,7 +8,6 @@ import PageTemplate from "../templates/PageTemplate";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Namespace, URI } from "../@utils/enums/enum";
-import apiClient from "../@utils/http-common/apiClient";
 import { Toast } from "primereact/toast";
 import handleLoginError from "../@utils/functions/handleErrors";
 import Cookies from "js-cookie";
@@ -17,6 +16,7 @@ import isAuthenticated from "../@utils/functions/isAuthenticated";
 import { jwtDecode } from "jwt-decode";
 import useUserDataStore from "../@utils/store/userDataStore";
 import extractUserData from "../@utils/functions/extractUserData";
+import axios from "axios";
 
 interface FormFields {
   employeeId: string;
@@ -41,13 +41,10 @@ const LoginPage = () => {
 
   const handleLogin = async ({ employeeId, password }: FormFields) => {
     try {
-      const response = await apiClient.post(
-        `${URI.API_URI}/api/v1/auth/login`,
-        {
-          employeeId,
-          password,
-        }
-      );
+      const response = await axios.post(`${URI.API_URI}/api/v1/auth/login`, {
+        employeeId,
+        password,
+      });
 
       if (response.status === 201) {
         const { accessToken, refreshToken } = response.data.tokens;
@@ -64,12 +61,6 @@ const LoginPage = () => {
           const expires = Math.floor((exp - currentTimestamp) / (60 * 60 * 24));
 
           Cookies.set(Namespace.BASE, refreshToken, { expires });
-
-          console.log(Cookies.get(Namespace.BASE));
-
-          Cookies.set("meow", "meow");
-
-          return;
 
           const userData = extractUserData();
 

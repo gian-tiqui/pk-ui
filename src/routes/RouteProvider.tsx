@@ -9,6 +9,7 @@ import CrmSidebar from "../components/CrmSidebar";
 import AmenityManagementPage from "../pages/AmenityManagementPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import FloorPage from "../pages/FloorPage";
 
 const RouteProvider = () => {
   const routes: RouteType[] = [
@@ -59,6 +60,12 @@ const RouteProvider = () => {
       hidden: true,
       path: "/forgot-password",
       element: <ForgotPasswordPage />,
+    },
+    {
+      name: "Selected Floor",
+      hidden: true,
+      path: "amenity-management/:floorId",
+      element: <FloorPage />,
     },
   ];
 

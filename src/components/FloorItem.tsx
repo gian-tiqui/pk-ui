@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction } from "react";
 import { Floor } from "../types/types";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
+import { useNavigate } from "react-router-dom";
 
 const FloorItem: React.FC<
   Floor & {
@@ -9,9 +10,14 @@ const FloorItem: React.FC<
     selectedId: number | undefined;
   }
 > = ({ code, name, id, selectedId, setSelectedId }) => {
+  const navigate = useNavigate();
+
   return (
     <Button
-      onClick={() => setSelectedId(id)}
+      onClick={() => {
+        setSelectedId(id);
+        navigate(`/amenity-management/${id}`);
+      }}
       className={`flex w-full h-12 gap-2 mb-2 text-sm border-none  ${
         id === selectedId ? "bg-gray-700" : "bg-inherit hover:bg-gray-800"
       }`}
