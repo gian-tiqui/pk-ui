@@ -65,6 +65,12 @@ const LoginPage = () => {
 
           Cookies.set(Namespace.BASE, refreshToken, { expires });
 
+          console.log(Cookies.get(Namespace.BASE));
+
+          Cookies.set("meow", "meow");
+
+          return;
+
           const userData = extractUserData();
 
           if (!userData) {
@@ -84,7 +90,7 @@ const LoginPage = () => {
             summary: "Login Successful",
           });
 
-          navigate("/amemity-management");
+          navigate("/amenity-management");
         }
       }
     } catch (error) {
@@ -122,7 +128,7 @@ const LoginPage = () => {
     const resetTimer = () => {
       setIsActive(true);
       clearTimeout(timeout);
-      timeout = setTimeout(() => setIsActive(false), 5000);
+      timeout = setTimeout(() => setIsActive(false), 5000000);
     };
 
     const activityEvents = ["mousemove", "click", "keydown"];
