@@ -21,6 +21,7 @@ import useUserDataStore from "../@utils/store/userDataStore";
 import { Question, Secrets } from "../types/types";
 import { confirmDialog } from "primereact/confirmdialog";
 import ClipboardDialog from "./ClipboardDialog";
+import CustomToast from "./CustomToast";
 
 interface FormFields {
   questionId: number;
@@ -144,7 +145,7 @@ const RecoveryMethod = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full pt-5 h-80">
-      <Toast ref={toastRef} />
+      <CustomToast ref={toastRef} />
       <ClipboardDialog
         secrets={secrets}
         visible={clipboardDialogVisible}
@@ -166,7 +167,7 @@ const RecoveryMethod = () => {
                 input: { className: "text-slate-100" },
               }}
               disabled={!isEditMode}
-              className="h-12 min-w-96 bg-inherit border-slate-400"
+              className="h-12 min-w-80 bg-inherit border-slate-400"
               value={selectedQuestion}
               onChange={(e) => {
                 setSelectedQuestion(e.value);

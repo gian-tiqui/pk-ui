@@ -14,6 +14,7 @@ import { Toast } from "primereact/toast";
 import handleErrors from "../@utils/functions/handleErrors";
 import { Dialog } from "primereact/dialog";
 import useHasSecretStore from "../@utils/store/userHasSecret";
+import CustomToast from "./CustomToast";
 
 const CrmSidebarFooter = () => {
   const navigate = useNavigate();
@@ -82,7 +83,7 @@ const CrmSidebarFooter = () => {
 
   return (
     <>
-      <Toast ref={toastRef} />
+      <CustomToast ref={toastRef} />
       <Dialog
         pt={{
           header: {

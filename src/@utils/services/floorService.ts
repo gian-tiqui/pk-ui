@@ -65,4 +65,23 @@ const getFloorRoomsById = async (floorId: number, query?: Query) => {
   }
 };
 
-export { getFloors, createFloor, getFloorById, getFloorRoomsById };
+const updateFloorById = async (
+  floorId: number,
+  name?: string,
+  code?: string,
+  level?: number
+) => {
+  return apiClient.patch(`${URI.API_URI}/api/v1/floor/${floorId}`, {
+    level,
+    code,
+    name,
+  });
+};
+
+export {
+  getFloors,
+  createFloor,
+  getFloorById,
+  getFloorRoomsById,
+  updateFloorById,
+};

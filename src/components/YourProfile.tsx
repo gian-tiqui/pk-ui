@@ -19,6 +19,7 @@ import { refresh } from "../@utils/services/authService";
 import { Namespace } from "../@utils/enums/enum";
 import extractUserData from "../@utils/functions/extractUserData";
 import handleErrors from "../@utils/functions/handleErrors";
+import CustomToast from "./CustomToast";
 
 const SettingsDetail = () => {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
@@ -135,7 +136,7 @@ const SettingsDetail = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full pt-4 h-80">
-      <Toast ref={toastRef} />
+      <CustomToast ref={toastRef} />
       <ScrollPanel style={{ height: "calc(72vh - 200px)" }} className="mb-5">
         <div className="flex justify-between w-full">
           <p className="w-full">First name</p>

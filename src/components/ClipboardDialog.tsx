@@ -3,6 +3,7 @@ import React, { Dispatch, SetStateAction, useRef } from "react";
 import { Secrets } from "../types/types";
 import "primeicons/primeicons.css";
 import { Toast } from "primereact/toast";
+import CustomToast from "./CustomToast";
 
 interface Props {
   visible: boolean;
@@ -28,7 +29,7 @@ const ClipboardDialog: React.FC<Props> = ({ visible, onHide, secrets }) => {
 
   return (
     <>
-      <Toast ref={toastRef} />
+      <CustomToast ref={toastRef} />
       <Dialog
         className="w-96"
         visible={visible}

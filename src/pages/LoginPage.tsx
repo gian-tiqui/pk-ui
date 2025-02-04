@@ -110,7 +110,7 @@ const LoginPage = () => {
   };
 
   useEffect(() => {
-    if (isActive === false) navigate(-1);
+    if (isActive === false) navigate("/");
   }, [isActive, navigate]);
 
   useEffect(() => {
@@ -119,7 +119,7 @@ const LoginPage = () => {
     const resetTimer = () => {
       setIsActive(true);
       clearTimeout(timeout);
-      timeout = setTimeout(() => setIsActive(false), 5000000);
+      timeout = setTimeout(() => setIsActive(false), 5000);
     };
 
     const activityEvents = ["mousemove", "click", "keydown"];
