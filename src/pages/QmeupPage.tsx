@@ -15,7 +15,7 @@ const QmeupPage = () => {
 
     timeoutRef.current = setTimeout(() => {
       setIsActive(false);
-    }, 2000);
+    }, 60000);
   }, []);
 
   const handleMouseLeave = useCallback(() => {

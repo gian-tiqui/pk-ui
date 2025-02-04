@@ -5,6 +5,10 @@ import { useParams } from "react-router-dom";
 import { getFloorRoomsById } from "../@utils/services/floorService";
 import useFloorRoomsSignalStore from "../@utils/store/floorRoomsSignal";
 import { FloorParam, Query } from "../types/types";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { Button } from "primereact/button";
+import { PrimeIcons } from "primereact/api";
 
 const FloorRoomsTable = () => {
   const param = useParams() as FloorParam;
@@ -30,10 +34,6 @@ const FloorRoomsTable = () => {
   });
 
   useEffect(() => {
-    console.log(rooms);
-  }, [rooms]);
-
-  useEffect(() => {
     refetchFloorRooms();
   }, [query, refetchFloorRooms]);
 
@@ -47,7 +47,26 @@ const FloorRoomsTable = () => {
 
   return (
     <section>
-      <InputText onChange={(e) => setSearchInput(e.target.value)} />
+      {/* <InputText onChange={(e) => setSearchInput(e.target.value)} /> */}
+      <DataTable
+        value={rooms}
+        pt={{
+          bodyRow: { className: "bg-slate-900" },
+          headerRow: { className: "bg-slate-900" },
+        }}
+      >
+        <Column field="name" header="Name" />
+        <Column field="code" header="Code" />
+        <Column field="detail" header="Detail" />
+        <Column field="createdAt" header="Created At" />
+        <Column field="updatedAt" header="Updated At" />
+        <Column
+          header="Action"
+          body={() => (
+            <Button className="w-10 h-10" icon={PrimeIcons.COG}></Button>
+          )}
+        />
+      </DataTable>
     </section>
   );
 };
