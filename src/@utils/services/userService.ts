@@ -42,10 +42,17 @@ const updateUserSecretById = async (
   );
 };
 
+const verifyPasswordById = async (userId: number, password: string) => {
+  return apiClient.post(
+    `${URI.API_URI}/api/v1/user/${userId}/verify?password=${password}`
+  );
+};
+
 export {
   getUser,
   updateUserById,
   changePassword,
   getUserSecret,
   updateUserSecretById,
+  verifyPasswordById,
 };
