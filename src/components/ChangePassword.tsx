@@ -13,6 +13,7 @@ import { confirmDialog } from "primereact/confirmdialog";
 import { changePassword } from "../@utils/services/userService";
 import useUserDataStore from "../@utils/store/userDataStore";
 import handleErrors from "../@utils/functions/handleErrors";
+import CustomToast from "./CustomToast";
 
 const ChangePassword = () => {
   const toastRef = useRef<Toast>(null);
@@ -69,7 +70,7 @@ const ChangePassword = () => {
       onSubmit={handleSubmit(handleSaveClicked)}
       className="w-full pt-5 h-80"
     >
-      <Toast ref={toastRef} />
+      <CustomToast ref={toastRef} />
       <ScrollPanel style={{ height: "calc(72vh - 200px)" }} className="mb-5">
         <div className="flex justify-between w-full">
           <p className="w-full">Old Password</p>

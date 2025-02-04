@@ -54,7 +54,7 @@ type Floor = {
   updatedAt: Date;
 };
 
-type SettingsPanel = {
+type Panel = {
   header: string;
   panel: ReactNode;
   icon: string;
@@ -92,6 +92,10 @@ type ForgotPassword = {
   answer: string;
 };
 
+type FloorParam = {
+  floorId: string;
+};
+
 export type {
   Route,
   UserData,
@@ -99,10 +103,11 @@ export type {
   Floor,
   Room,
   Question,
-  SettingsPanel,
+  Panel,
   User,
   ChangePassword,
   Department,
   Secrets,
   ForgotPassword,
+  FloorParam,
 };

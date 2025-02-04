@@ -1,13 +1,14 @@
 import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
 import React, { Dispatch, SetStateAction, useRef } from "react";
-import { SettingsPanel } from "../types/types";
+import { Panel } from "../types/types";
 import SettingsDetail from "./YourProfile";
 import ChangePassword from "./ChangePassword";
 import RecoveryMethod from "./RecoveryMethod";
 import useHasSecretStore from "../@utils/store/userHasSecret";
 import { Toast } from "primereact/toast";
 import { PrimeIcons } from "primereact/api";
+import CustomToast from "./CustomToast";
 
 interface Props {
   visible: boolean;
@@ -17,7 +18,7 @@ interface Props {
 const SettingsDialog: React.FC<Props> = ({ visible, setVisible }) => {
   const { hasSecret } = useHasSecretStore();
   const toastRef = useRef<Toast>(null);
-  const settingsPanels: SettingsPanel[] = [
+  const settingsPanels: Panel[] = [
     {
       header: "Your Profile",
       panel: <SettingsDetail />,
@@ -37,7 +38,7 @@ const SettingsDialog: React.FC<Props> = ({ visible, setVisible }) => {
 
   return (
     <>
-      <Toast ref={toastRef} />
+      <CustomToast ref={toastRef} />
       <Dialog
         className="w-80 md:w-[80%] h-[85vh]"
         pt={{

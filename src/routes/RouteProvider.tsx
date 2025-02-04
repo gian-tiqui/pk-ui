@@ -3,13 +3,13 @@ import { Route as RouteType } from "../types/types";
 import LandingPage from "../pages/LandingPage";
 import MainPage from "../pages/MainPage";
 import FindAmenityPage from "../pages/FindAmenityPage";
-import QMEUP from "../pages/QMEUP";
 import LoginPage from "../pages/LoginPage";
 import CrmSidebar from "../components/CrmSidebar";
 import AmenityManagementPage from "../pages/AmenityManagementPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import FloorPage from "../pages/FloorPage";
+import QmeupPage from "../pages/QmeupPage";
 
 const RouteProvider = () => {
   const routes: RouteType[] = [
@@ -41,7 +41,7 @@ const RouteProvider = () => {
       name: "QMEUP Page",
       hidden: false,
       path: "/qmeup",
-      element: <QMEUP />,
+      element: <QmeupPage />,
     },
     {
       name: "Login Page",
