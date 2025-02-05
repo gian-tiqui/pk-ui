@@ -6,7 +6,7 @@ import FloorPageContent from "../components/FloorPageContent";
 const FloorPage = () => {
   return (
     <PageTemplate>
-      <div className="h-full px-10 pt-16">
+      <div className="h-full px-10">
         <FloorPageHeader />
         <FloorPageContent />
       </div>

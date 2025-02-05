@@ -29,7 +29,7 @@ const FloorPageHeader = () => {
   }, [refreshFloorHeader, setRefreshFloorHeader, refetchFloorData]);
 
   return (
-    <header className="flex items-center w-full h-20 mb-8 ">
+    <header className="flex items-center w-full px-4 pt-8">
       <AddRoomDialog
         visible={addRoomDialogVisible}
         setVisible={setAddRoomDialogVisible}
@@ -39,25 +39,27 @@ const FloorPageHeader = () => {
         setVisible={setDeleteFloorDialogVisible}
       />
       <div className="flex items-center flex-1 w-full h-20 gap-4">
-        <div className="grid w-20 h-20 text-4xl font-bold bg-blue-500 rounded-lg place-content-center">
+        <div className="grid w-12 h-12 text-xl font-bold bg-blue-500 rounded-lg place-content-center">
           {floor?.code}
         </div>
         <div>
-          <h4 className="text-4xl font-medium">{floor?.name}</h4>
+          <h4 className="text-xl font-medium">{floor?.name}</h4>
           <p className="font-medium">Floor Level: {floor?.level}</p>
         </div>
       </div>
       <div className="flex justify-center flex-1"></div>
       <div className="flex justify-end flex-1 gap-2">
         <Button
-          icon="pi pi-plus text-xl"
+          icon="pi pi-plus text-lg"
           tooltip="Add floor"
+          className="w-10 h-10"
           tooltipOptions={{ position: "left" }}
           onClick={() => setAddRoomDialogVisible(true)}
         ></Button>
         <Button
-          icon="pi pi-trash text-xl"
+          icon="pi pi-trash text-lg"
           severity="danger"
+          className="w-10 h-10"
           tooltip="Delete floor"
           tooltipOptions={{ position: "bottom" }}
           onClick={() => setDeleteFloorDialogVisible(true)}

@@ -6,12 +6,13 @@ import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
-import React, { Dispatch, SetStateAction, useEffect, useRef } from "react";
+import React, { Dispatch, SetStateAction, useRef } from "react";
 import { useForm } from "react-hook-form";
 import handleErrors from "../@utils/functions/handleErrors";
 import { useParams } from "react-router-dom";
 import { createRoom } from "../@utils/services/roomService";
 import useFloorRoomsSignalStore from "../@utils/store/floorRoomsSignal";
+import { FloorParam } from "../types/types";
 
 interface Props {
   visible: boolean;
@@ -21,13 +22,12 @@ interface Props {
 interface FormFields {
   name: string;
   code: string;
-  detail: string;
   floorId: number;
 }
 
 const AddRoomDialog: React.FC<Props> = ({ visible, setVisible }) => {
   const toastRef = useRef<Toast>(null);
-  const param = useParams();
+  const param = useParams() as FloorParam;
   const { setFloorRoomsSignal } = useFloorRoomsSignalStore();
 
   const {
@@ -36,17 +36,12 @@ const AddRoomDialog: React.FC<Props> = ({ visible, setVisible }) => {
     handleSubmit,
     reset,
     getValues,
-    setValue,
   } = useForm<FormFields>();
 
-  useEffect(() => {
-    if (param.floorId) setValue("floorId", +param.floorId);
-  }, [setValue, param]);
-
   const accept = () => {
-    const { name, code, detail, floorId } = getValues();
+    const { name, code } = getValues();
 
-    createRoom(name, code, detail, floorId)
+    createRoom(name, code, +param.floorId)
       .then((response) => {
         if (response.status === 201) {
           const message =
@@ -85,7 +80,10 @@ const AddRoomDialog: React.FC<Props> = ({ visible, setVisible }) => {
       <Dialog
         header="Add a room"
         visible={visible}
-        onHide={() => setVisible(false)}
+        onHide={() => {
+          setVisible(false);
+          reset();
+        }}
         className="p-4 w-96"
         pt={{
           header: {
@@ -152,22 +150,7 @@ const AddRoomDialog: React.FC<Props> = ({ visible, setVisible }) => {
               </small>
             )}
           </div>
-          <div className="h-24">
-            <label
-              htmlFor="roomDetailInput"
-              className="text-sm font-semibold text-blue-400"
-            >
-              Room detail
-            </label>
-            <IconField id="roomDetailInput" iconPosition="left">
-              <InputIcon className={`${PrimeIcons.ALIGN_LEFT}`}></InputIcon>
-              <InputText
-                {...register("detail", { required: true })}
-                placeholder="Ihian ng ekalals"
-                className="w-full bg-inherit border-slate-600 text-slate-100 hover:border-blue-400"
-              />
-            </IconField>
-          </div>
+
           <Button
             type="submit"
             className="justify-center w-full h-10 gap-2 mt-2 font-medium"
