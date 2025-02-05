@@ -11,23 +11,30 @@ import { PrimeIcons } from "primereact/api";
 import { InputText } from "primereact/inputtext";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
+import RoomSettingsDialog from "./RoomSettingsDialog";
+import { Toast } from "primereact/toast";
 
 interface Props {
   isDeleted?: boolean;
 }
 
 const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
+  const toast = useRef<Toast>(null);
   const defaultQuery: Query = {
     search: "",
     sortBy: "name",
     sortOrder: "asc",
     isDeleted,
+    offset: 0,
+    limit: 5,
   };
+  const [roomSettingVisible, setRoomSettingVisisble] = useState<boolean>(false);
   const dataTableRef = useRef<DataTable<Room[]>>(null);
   const param = useParams() as FloorParam;
   const [query, setQuery] = useState<Query>(defaultQuery);
   const [searchInput, setSearchInput] = useState<string>("");
   const { floorRoomsSignal, setFloorRoomsSignal } = useFloorRoomsSignalStore();
+  const [selectedFloorId, setSelectedFloorId] = useState<number>(-1);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -37,7 +44,7 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
     return () => clearTimeout(handler);
   }, [searchInput]);
 
-  const { data: rooms, refetch: refetchFloorRooms } = useQuery({
+  const { data, refetch: refetchFloorRooms } = useQuery({
     queryKey: [`floor-${param.floorId}-rooms-${JSON.stringify(query)}`],
     queryFn: () => getFloorRoomsById(+param.floorId, query),
   });
@@ -54,45 +61,84 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
     return () => setFloorRoomsSignal(false);
   }, [refetchFloorRooms, setFloorRoomsSignal, floorRoomsSignal]);
 
+  const handleNextPageClicked = () => {};
+
+  const handlePrevPageClicked = () => {};
+
   return (
     <section>
-      <div className="flex justify-end w-full gap-2 mb-4">
-        <IconField iconPosition="left">
-          <InputIcon className="pi pi-search"> </InputIcon>
-          <InputText
-            onChange={(e) => setSearchInput(e.target.value)}
-            value={searchInput}
-            placeholder="Search"
-            className="h-10 border bg-inherit border-slate-600 text-slate-100"
-          />
-        </IconField>
-        <Button
-          className="w-10 h-10"
-          severity="warning"
-          icon={`${PrimeIcons.EXCLAMATION_TRIANGLE}`}
-          tooltip="Rooms with incomplete data"
-          tooltipOptions={{ position: "bottom" }}
-        ></Button>
-        <Button
-          className="w-10 h-10"
-          tooltip="Clear Filters"
-          icon={`${PrimeIcons.REFRESH}`}
-          tooltipOptions={{ position: "bottom" }}
-          onClick={() => {
-            setQuery(defaultQuery);
-            setSearchInput("");
-            dataTableRef.current?.reset();
-          }}
-        ></Button>
+      <Toast ref={toast} />
+      <RoomSettingsDialog
+        roomId={selectedFloorId}
+        visible={roomSettingVisible}
+        setVisible={setRoomSettingVisisble}
+      />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center w-full">
+          <p className="text-lg font-medium text-slate-100">
+            Total number of rooms: {data?.count}
+          </p>
+        </div>
+        <div className="flex justify-end w-full gap-2 mb-4">
+          <Button
+            className="w-10 h-10"
+            icon={`${PrimeIcons.BACKWARD}`}
+            tooltip="Previous Page"
+            tooltipOptions={{ position: "bottom" }}
+            onClick={handlePrevPageClicked}
+          ></Button>
+          <Button
+            className="w-10 h-10"
+            icon={`${PrimeIcons.FORWARD}`}
+            tooltip="Next Page"
+            tooltipOptions={{ position: "bottom" }}
+            onClick={handleNextPageClicked}
+          ></Button>
+          <IconField iconPosition="left">
+            <InputIcon className="pi pi-search"> </InputIcon>
+            <InputText
+              onChange={(e) => setSearchInput(e.target.value)}
+              value={searchInput}
+              placeholder="Search"
+              className="h-10 border bg-inherit border-slate-600 text-slate-100"
+            />
+          </IconField>
+          <Button
+            className="w-10 h-10"
+            severity="warning"
+            icon={`${PrimeIcons.EXCLAMATION_TRIANGLE}`}
+            tooltip="Rooms with incomplete data"
+            tooltipOptions={{ position: "bottom" }}
+            onClick={() => {
+              setQuery((prev) => ({ ...prev, isIncomplete: true }));
+            }}
+          ></Button>
+          <Button
+            className="w-10 h-10"
+            tooltip="Clear Filters"
+            icon={`${PrimeIcons.REFRESH}`}
+            tooltipOptions={{ position: "bottom" }}
+            onClick={() => {
+              setQuery(defaultQuery);
+              setSearchInput("");
+              dataTableRef.current?.reset();
+            }}
+          ></Button>
+        </div>
       </div>
+
       <DataTable
         ref={dataTableRef}
-        value={rooms}
-        scrollable
-        scrollHeight="320px"
+        value={data?.rooms}
+        size="small"
+        // scrollable
+        // scrollHeight="320px"
         pt={{
           bodyRow: { className: "bg-slate-900" },
           headerRow: { className: "bg-slate-900" },
+        }}
+        onRowMouseEnter={(e) => {
+          setSelectedFloorId(e.data.id);
         }}
       >
         <Column
@@ -132,7 +178,11 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
               {isDeleted ? (
                 <Button className="w-10 h-10" icon={PrimeIcons.COG}></Button>
               ) : (
-                <Button className="w-10 h-10" icon={PrimeIcons.COG}></Button>
+                <Button
+                  className="w-10 h-10"
+                  icon={PrimeIcons.COG}
+                  onClick={() => setRoomSettingVisisble(true)}
+                ></Button>
               )}
             </>
           )}
