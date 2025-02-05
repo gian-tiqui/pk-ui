@@ -63,7 +63,12 @@ const SettingsDialog: React.FC<Props> = ({ visible, setVisible }) => {
           }
           if (visible === true) setVisible(false);
         }}
-        header={`User Settings`}
+        header={
+          <div className="flex items-center gap-2">
+            <i className={`${PrimeIcons.COG} text-xl`}></i>
+            <p>User Settings</p>
+          </div>
+        }
       >
         <TabView
           pt={{

@@ -48,7 +48,10 @@ const getFloorById = async (floorId: number) => {
   }
 };
 
-const getFloorRoomsById = async (floorId: number, query?: Query) => {
+const getFloorRoomsById = async (
+  floorId: number,
+  query?: Query
+): Promise<{ rooms: Room[]; count: number }> => {
   try {
     const response = await apiClient.get(
       `${URI.API_URI}/api/v1/floor/${floorId}/room`,
@@ -56,11 +59,12 @@ const getFloorRoomsById = async (floorId: number, query?: Query) => {
     );
 
     const rooms: Room[] = response.data.rooms ?? [];
+    const count: number = response.data.count;
 
-    return rooms;
+    return { rooms, count };
   } catch (error) {
     console.error(error);
-    return [];
+    return { rooms: [] as Room[], count: 0 };
   }
 };
 

@@ -145,8 +145,8 @@ const ChangePassword = () => {
         <Divider />
       </ScrollPanel>
       <div className="flex justify-end gap-2">
-        <Button className="w-52" type="submit">
-          Save
+        <Button className="w-52" type="submit" icon={`${PrimeIcons.KEY} mr-2`}>
+          Change Password
         </Button>
       </div>
     </form>

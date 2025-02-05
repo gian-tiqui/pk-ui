@@ -31,6 +31,7 @@ type Query = {
   sortOrder?: string;
   isDeleted?: boolean;
   roomImageDeleted?: boolean;
+  isIncomplete?: boolean;
 };
 
 type Room = {
