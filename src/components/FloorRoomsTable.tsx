@@ -13,13 +13,21 @@ import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import RoomSettingsDialog from "./RoomSettingsDialog";
 import { Toast } from "primereact/toast";
+import { confirmDialog } from "primereact/confirmdialog";
+import {
+  removeRoomById,
+  retrieveRoomById,
+} from "../@utils/services/roomService";
+import handleErrors from "../@utils/functions/handleErrors";
+import { OverlayPanel } from "primereact/overlaypanel";
 
 interface Props {
   isDeleted?: boolean;
 }
 
 const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
-  const toast = useRef<Toast>(null);
+  const toastRef = useRef<Toast>(null);
+  const overlayPanelRef = useRef<OverlayPanel>(null);
   const defaultQuery: Query = {
     search: "",
     sortBy: "name",
@@ -34,7 +42,7 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
   const [query, setQuery] = useState<Query>(defaultQuery);
   const [searchInput, setSearchInput] = useState<string>("");
   const { floorRoomsSignal, setFloorRoomsSignal } = useFloorRoomsSignalStore();
-  const [selectedFloorId, setSelectedFloorId] = useState<number>(-1);
+  const [selectedRoomId, setSelectedRoomId] = useState<number>(-1);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -65,11 +73,61 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
 
   const handlePrevPageClicked = () => {};
 
+  const accept = () => {
+    retrieveRoomById(selectedRoomId)
+      .then((response) => {
+        if (response.status === 200) {
+          setFloorRoomsSignal(true);
+        }
+      })
+      .catch((error) => handleErrors(error, toastRef));
+  };
+
+  const handleRetrieveFloorButtonClicked = () => {
+    confirmDialog({
+      message: "Do you want to retrieve this room?",
+      header: "Retrieve Room",
+      icon: PrimeIcons.QUESTION_CIRCLE,
+      defaultFocus: "reject",
+      accept,
+    });
+  };
+
+  const acceptRemoveRoom = () => {
+    removeRoomById(selectedRoomId)
+      .then((response) => {
+        if (response.status === 200) {
+          toastRef.current?.show({
+            severity: "info",
+            summary: "Success",
+            detail: "Room deleted successfully",
+          });
+          setFloorRoomsSignal(true);
+        }
+      })
+      .catch((error) => handleErrors(error, toastRef));
+  };
+
+  const handleRemoveFloorButtonClicked = () => {
+    confirmDialog({
+      message: (
+        <p>
+          Do you want to{" "}
+          <span className="text-red-500">permanently delete</span> this room?
+        </p>
+      ),
+      header: "Delete Room",
+      icon: PrimeIcons.QUESTION_CIRCLE,
+      defaultFocus: "reject",
+      accept: acceptRemoveRoom,
+    });
+  };
+
   return (
     <section>
-      <Toast ref={toast} />
+      <Toast ref={toastRef} />
       <RoomSettingsDialog
-        roomId={selectedFloorId}
+        roomId={selectedRoomId}
         visible={roomSettingVisible}
         setVisible={setRoomSettingVisisble}
       />
@@ -103,20 +161,22 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
               className="h-10 border bg-inherit border-slate-600 text-slate-100"
             />
           </IconField>
-          <Button
-            className="w-10 h-10"
-            severity="warning"
-            icon={`${PrimeIcons.EXCLAMATION_TRIANGLE}`}
-            tooltip="Rooms with incomplete data"
-            tooltipOptions={{ position: "bottom" }}
-            onClick={() => {
-              setQuery((prev) => ({ ...prev, isIncomplete: true }));
-            }}
-          ></Button>
+          {!isDeleted && (
+            <Button
+              className="w-10 h-10"
+              severity="warning"
+              icon={`${PrimeIcons.EXCLAMATION_TRIANGLE}`}
+              tooltip="Rooms with incomplete data"
+              tooltipOptions={{ position: "bottom" }}
+              onClick={() => {
+                setQuery((prev) => ({ ...prev, isIncomplete: true }));
+              }}
+            ></Button>
+          )}
           <Button
             className="w-10 h-10"
             tooltip="Clear Filters"
-            icon={`${PrimeIcons.REFRESH}`}
+            icon={`${PrimeIcons.UNDO}`}
             tooltipOptions={{ position: "bottom" }}
             onClick={() => {
               setQuery(defaultQuery);
@@ -137,51 +197,109 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
           bodyRow: { className: "bg-slate-900" },
           headerRow: { className: "bg-slate-900" },
         }}
-        onRowMouseEnter={(e) => {
-          setSelectedFloorId(e.data.id);
-        }}
       >
         <Column
+          pt={{
+            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
+            sortIcon: { className: "text-slate-100" },
+          }}
           sortable
           field="name"
           className="text-slate-100"
           header="Name"
         />
         <Column
+          pt={{
+            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
+            sortIcon: { className: "text-slate-100" },
+          }}
           sortable
           field="code"
           className="text-slate-100"
           header="Code"
         />
         <Column
+          pt={{
+            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
+            sortIcon: { className: "text-slate-100" },
+          }}
           sortable
           field="detail"
           className="text-slate-100"
           header="Detail"
         />
         <Column
+          pt={{
+            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
+            sortIcon: { className: "text-slate-100" },
+          }}
           sortable
           field="createdAt"
           className="text-slate-100"
           header="Created At"
         />
         <Column
+          pt={{
+            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
+            sortIcon: { className: "text-slate-100" },
+          }}
           sortable
           field="updatedAt"
           className="text-slate-100"
           header="Updated At"
         />
         <Column
+          pt={{
+            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
+          }}
           header="Action"
-          body={() => (
+          body={(rowData) => (
             <>
               {isDeleted ? (
-                <Button className="w-10 h-10" icon={PrimeIcons.COG}></Button>
+                <>
+                  <OverlayPanel
+                    ref={overlayPanelRef}
+                    className=" bg-slate-800"
+                    pt={{ content: { className: "flex gap-3 flex-col p-3" } }}
+                  >
+                    <Button
+                      className="h-10 "
+                      icon={`${PrimeIcons.UNDO} me-2`}
+                      onClick={() => {
+                        handleRetrieveFloorButtonClicked();
+                      }}
+                    >
+                      Restore
+                    </Button>
+                    <Button
+                      className="h-10 "
+                      severity="danger"
+                      icon={`${PrimeIcons.TRASH} me-2`}
+                      onClick={() => {
+                        handleRemoveFloorButtonClicked();
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </OverlayPanel>
+                  <Button
+                    className="w-10 h-10"
+                    icon={PrimeIcons.COG}
+                    onClick={(e) => {
+                      setSelectedRoomId(rowData.id);
+                      overlayPanelRef.current?.toggle(e);
+                    }}
+                  ></Button>
+                </>
               ) : (
                 <Button
                   className="w-10 h-10"
                   icon={PrimeIcons.COG}
-                  onClick={() => setRoomSettingVisisble(true)}
+                  onClick={() => {
+                    setSelectedRoomId(rowData.id);
+
+                    setRoomSettingVisisble(true);
+                  }}
                 ></Button>
               )}
             </>

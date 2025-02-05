@@ -81,7 +81,6 @@ const AmenityManagementPage = () => {
         <section className="flex flex-col mb-6">
           <small className="text-slate-300">Recently added floors</small>
           <small className="text-slate-300">Floors without rooms</small>
-          <small className="text-slate-300">Rooms without images</small>
         </section>
       </main>
     </PageTemplate>

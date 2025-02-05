@@ -141,13 +141,18 @@ const FloorSettingsPanel = () => {
             className="w-52"
             severity="danger"
             type="button"
+            icon={`${PrimeIcons.SIGN_OUT} mr-2 text-xl`}
             onClick={() => setIsEditMode(false)}
           >
             Cancel
           </Button>
         )}
         {isEditMode && (
-          <Button className="w-52" type="submit">
+          <Button
+            className="w-52"
+            type="submit"
+            icon={`${PrimeIcons.SAVE} mr-2 text-xl`}
+          >
             Save
           </Button>
         )}
@@ -156,6 +161,7 @@ const FloorSettingsPanel = () => {
             className="w-52"
             type="button"
             onClick={() => setIsEditMode(true)}
+            icon={`${PrimeIcons.USER_EDIT} mr-2 text-xl`}
           >
             Edit
           </Button>

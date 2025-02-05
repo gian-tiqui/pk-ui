@@ -26,4 +26,22 @@ const getRoomById = async (roomId: number): Promise<Room | undefined> => {
   }
 };
 
-export { createRoom, getRoomById };
+const softDeleteRoomById = async (roomId: number) => {
+  return apiClient.delete(`${URI.API_URI}/api/v1/room/${roomId}/soft-delete`);
+};
+
+const removeRoomById = async (roomId: number) => {
+  return apiClient.delete(`${URI.API_URI}/api/v1/room/${roomId}`);
+};
+
+const retrieveRoomById = async (roomId: number) => {
+  return apiClient.patch(`${URI.API_URI}/api/v1/room/${roomId}/retrieve`);
+};
+
+export {
+  createRoom,
+  getRoomById,
+  softDeleteRoomById,
+  retrieveRoomById,
+  removeRoomById,
+};
