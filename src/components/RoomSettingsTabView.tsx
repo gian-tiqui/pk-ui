@@ -1,13 +1,29 @@
 import { PrimeIcons } from "primereact/api";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Panel } from "../types/types";
+import RoomSettingsTab from "./RoomSettingsTab";
+import React, { Dispatch, SetStateAction } from "react";
+import RoomDetailsTabView from "./RoomDetailsTabView";
 
-const RoomSettingsTabView = () => {
+interface Props {
+  roomId: number;
+  setVisible: Dispatch<SetStateAction<boolean>>;
+}
+
+const RoomSettingsTabView: React.FC<Props> = ({ roomId, setVisible }) => {
   const roomPanels: Panel[] = [
-    { header: "Details", icon: `${PrimeIcons.HOME} me-2`, panel: null },
+    {
+      header: "Details",
+      icon: `${PrimeIcons.HOME} me-2`,
+      panel: <RoomDetailsTabView />,
+    },
     { header: "Image", icon: `${PrimeIcons.IMAGE} me-2`, panel: null },
     { header: "Images", icon: `${PrimeIcons.IMAGES} me-2`, panel: null },
-    { header: "Settings", icon: `${PrimeIcons.COG} me-2`, panel: null },
+    {
+      header: "Settings",
+      icon: `${PrimeIcons.COG} me-2`,
+      panel: <RoomSettingsTab roomId={roomId} setVisible={setVisible} />,
+    },
   ];
 
   return (

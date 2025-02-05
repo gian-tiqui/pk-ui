@@ -30,12 +30,7 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
   const scrollPanelRef = useRef<ScrollPanel>(null);
   const navigate = useNavigate();
 
-  const {
-    data: floors,
-    refetch,
-    isError,
-    isLoading,
-  } = useQuery({
+  const { data, refetch, isError, isLoading } = useQuery({
     queryKey: [`floors-${JSON.stringify(query)}`],
     queryFn: () => getFloors(query),
   });
@@ -44,7 +39,7 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
     const handleScroll = () => {
       if (scrollPanelRef.current) {
         const content = scrollPanelRef.current.getContent();
-        if (floors && floors?.length < 10) return;
+        if (data?.floors && data?.floors.length < 10) return;
         if (content) {
           const { scrollTop, scrollHeight, clientHeight } = content;
           if (scrollTop + clientHeight >= scrollHeight - 1) {
@@ -75,7 +70,7 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
         content.removeEventListener("scroll", handleScroll);
       }
     };
-  }, [floors]);
+  }, [data]);
 
   useEffect(() => {
     if (refresh === true) {
@@ -129,7 +124,7 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
       <ScrollPanel
         ref={scrollPanelRef}
         className={`pb-36 ms-5 ${
-          floors && floors?.length > 6 ? "me-1" : "me-5"
+          data?.floors && data?.floors?.length > 6 ? "me-1" : "me-5"
         }`}
         style={{ height: "calc(100vh - 250px)" }}
       >
@@ -139,10 +134,10 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
             There was a problem in loading the floors
           </small>
         )}
-        {floors && floors.length === 0 ? (
+        {data?.floors && data?.floors.length === 0 ? (
           <small className="text-slate-100">No floors yet</small>
         ) : (
-          floors?.map((floor) => (
+          data?.floors?.map((floor) => (
             <FloorItem
               key={floor.id}
               {...floor}

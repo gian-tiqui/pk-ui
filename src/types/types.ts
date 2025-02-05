@@ -34,16 +34,6 @@ type Query = {
   isIncomplete?: boolean;
 };
 
-type Room = {
-  id: number;
-  name: string;
-  code: string;
-  detail?: string;
-  floorId: number;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
 type Floor = {
   id: number;
   name: string;
@@ -53,6 +43,17 @@ type Floor = {
   rooms: Room[];
   createdAt: Date;
   updatedAt: Date;
+};
+
+type Room = {
+  id: number;
+  name: string;
+  code: string;
+  detail?: string;
+  floorId: number;
+  createdAt: Date;
+  updatedAt: Date;
+  floor: Floor;
 };
 
 type Panel = {

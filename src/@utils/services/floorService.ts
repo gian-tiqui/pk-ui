@@ -12,7 +12,9 @@ const createFloor = async (name: string, code: string, level: number) => {
   });
 };
 
-const getFloors = async (query: Query) => {
+const getFloors = async (
+  query: Query
+): Promise<{ floors: Floor[]; count: number } | undefined> => {
   try {
     const response = await apiClient.get(
       `${URI.API_URI}/api/v1/floor?search=${query.search}&limit=${
@@ -22,13 +24,14 @@ const getFloors = async (query: Query) => {
 
     if (response.status === 200) {
       const floors: Floor[] = response.data.floors;
+      const count: number = response.data.count;
 
-      return floors;
+      return { floors, count };
     }
   } catch (error) {
     console.error(error);
 
-    return [];
+    return { floors: [], count: -1 };
   }
 };
 

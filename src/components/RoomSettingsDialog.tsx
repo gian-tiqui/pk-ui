@@ -45,7 +45,7 @@ const RoomSettingsDialog: React.FC<Props> = ({
       }}
     >
       <div className="w-full h-full">
-        <RoomSettingsTabView />
+        <RoomSettingsTabView roomId={roomId} setVisible={setVisible} />
       </div>
     </Dialog>
   );

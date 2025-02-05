@@ -3,6 +3,7 @@ import { TabView, TabPanel } from "primereact/tabview";
 import { Panel } from "../types/types";
 import FloorSettingsPanel from "./FloorSettingsPanel";
 import RoomsPanel from "./RoomsPanel";
+import DeletedRoomsPanel from "./DeletedRoomsPanel";
 
 const FloorPageContent = () => {
   const roomPanels: Panel[] = [
@@ -11,7 +12,7 @@ const FloorPageContent = () => {
     {
       header: "Deleted Rooms",
       icon: `${PrimeIcons.TRASH} me-2`,
-      panel: null,
+      panel: <DeletedRoomsPanel />,
     },
     {
       header: "Floor Settings",
