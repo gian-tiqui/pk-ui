@@ -7,7 +7,7 @@ import RoomsPanel from "./RoomsPanel";
 const FloorPageContent = () => {
   const roomPanels: Panel[] = [
     { header: "Rooms", icon: `${PrimeIcons.HOME} me-2`, panel: <RoomsPanel /> },
-    { header: "New Rooms", icon: `${PrimeIcons.CLOCK} me-2`, panel: null },
+
     {
       header: "Deleted Rooms",
       icon: `${PrimeIcons.TRASH} me-2`,

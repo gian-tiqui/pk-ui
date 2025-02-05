@@ -51,9 +51,8 @@ const getFloorById = async (floorId: number) => {
 const getFloorRoomsById = async (floorId: number, query?: Query) => {
   try {
     const response = await apiClient.get(
-      `${URI.API_URI}/api/v1/floor/${floorId}/room?search=${
-        query?.search || ""
-      }&limit=${query?.limit || 10}`
+      `${URI.API_URI}/api/v1/floor/${floorId}/room`,
+      { params: query }
     );
 
     const rooms: Room[] = response.data.rooms ?? [];
@@ -78,10 +77,15 @@ const updateFloorById = async (
   });
 };
 
+const softDeleteFloorById = async (floorId: number) => {
+  return apiClient.delete(`${URI.API_URI}/api/v1/floor/${floorId}`);
+};
+
 export {
   getFloors,
   createFloor,
   getFloorById,
   getFloorRoomsById,
   updateFloorById,
+  softDeleteFloorById,
 };

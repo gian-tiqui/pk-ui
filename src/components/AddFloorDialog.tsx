@@ -90,7 +90,10 @@ const AddFloorDialog: React.FC<Props> = ({ visible, onHide, setVisible }) => {
       <Dialog
         header="Add a floor"
         visible={visible}
-        onHide={onHide}
+        onHide={() => {
+          onHide();
+          reset();
+        }}
         className="p-4 w-96"
         pt={{
           header: {

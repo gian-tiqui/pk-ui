@@ -15,6 +15,8 @@ import React, {
 import { getFloors } from "../@utils/services/floorService";
 import { Query } from "../types/types";
 import useCrmSidebarSignalStore from "../@utils/store/crmSidebarSectionSignal";
+import { Button } from "primereact/button";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;
@@ -26,42 +28,7 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
   const [query, setQuery] = useState<Query>({});
   const { refresh, setRefresh } = useCrmSidebarSignalStore();
   const scrollPanelRef = useRef<ScrollPanel>(null);
-
-  const handleScroll = () => {
-    if (scrollPanelRef.current) {
-      const content = scrollPanelRef.current.getContent();
-      if (content) {
-        const { scrollTop, scrollHeight, clientHeight } = content;
-        if (scrollTop + clientHeight >= scrollHeight - 1) {
-          setQuery((prevQuery) => {
-            if (prevQuery.limit) {
-              return {
-                ...prevQuery,
-                limit: prevQuery.limit + 10,
-              };
-            }
-
-            return {
-              ...prevQuery,
-              limit: 20,
-            };
-          });
-        }
-      }
-    }
-  };
-
-  useEffect(() => {
-    const content = scrollPanelRef.current?.getContent();
-    if (content) {
-      content.addEventListener("scroll", handleScroll);
-    }
-    return () => {
-      if (content) {
-        content.removeEventListener("scroll", handleScroll);
-      }
-    };
-  }, []);
+  const navigate = useNavigate();
 
   const {
     data: floors,
@@ -71,8 +38,44 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
   } = useQuery({
     queryKey: [`floors-${JSON.stringify(query)}`],
     queryFn: () => getFloors(query),
-    // staleTime: 1000 * 60 * 2,
   });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollPanelRef.current) {
+        const content = scrollPanelRef.current.getContent();
+        if (floors && floors?.length < 10) return;
+        if (content) {
+          const { scrollTop, scrollHeight, clientHeight } = content;
+          if (scrollTop + clientHeight >= scrollHeight - 1) {
+            setQuery((prevQuery) => {
+              if (prevQuery.limit) {
+                return {
+                  ...prevQuery,
+                  limit: prevQuery.limit + 10,
+                };
+              }
+
+              return {
+                ...prevQuery,
+                limit: 20,
+              };
+            });
+          }
+        }
+      }
+    };
+
+    const content = scrollPanelRef.current?.getContent();
+    if (content) {
+      content.addEventListener("scroll", handleScroll);
+    }
+    return () => {
+      if (content) {
+        content.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [floors]);
 
   useEffect(() => {
     if (refresh === true) {
@@ -96,6 +99,15 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
 
   return (
     <section className="flex-1 overflow-hidden">
+      <div className="py-2 mx-5">
+        <Button
+          onClick={() => navigate("/amenity-management")}
+          className="w-full h-10 px-3"
+          icon={`${PrimeIcons.HOME} mr-3 text-lg`}
+        >
+          Home
+        </Button>
+      </div>
       <IconField iconPosition="left" className="mx-5 mt-2 mb-5">
         <InputIcon className="pi pi-search"> </InputIcon>
         <InputText
@@ -119,7 +131,7 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
         className={`pb-36 ms-5 ${
           floors && floors?.length > 6 ? "me-1" : "me-5"
         }`}
-        style={{ height: "calc(100vh - 200px)" }}
+        style={{ height: "calc(100vh - 250px)" }}
       >
         {isLoading && <small className="text-slate-100">Loading floors</small>}
         {isError && (
