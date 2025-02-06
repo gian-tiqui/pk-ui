@@ -41,6 +41,7 @@ type Floor = {
   code: string;
   isDeleted: boolean;
   rooms: Room[];
+  imageLocation?: string;
   createdAt: Date;
   updatedAt: Date;
 };

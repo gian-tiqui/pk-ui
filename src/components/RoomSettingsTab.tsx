@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import {
   getRoomById,
   softDeleteRoomById,
+  updateRoomById,
 } from "../@utils/services/roomService";
 import { useQuery } from "@tanstack/react-query";
 import { confirmDialog } from "primereact/confirmdialog";
@@ -37,7 +38,7 @@ interface FormFields {
 const RoomSettingsTab: React.FC<Props> = ({ roomId, setVisible }) => {
   const toastRef = useRef<Toast>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const { register, setValue } = useForm<FormFields>();
+  const { register, setValue, handleSubmit, getValues } = useForm<FormFields>();
   const { setFloorRoomsSignal } = useFloorRoomsSignalStore();
 
   const { data: room } = useQuery({
@@ -66,6 +67,35 @@ const RoomSettingsTab: React.FC<Props> = ({ roomId, setVisible }) => {
       .catch((error) => handleErrors(error, toastRef));
   };
 
+  const updateRoom = () => {
+    const { name, code } = getValues();
+
+    if (roomId) {
+      updateRoomById(roomId, name, code)
+        .then((response) => {
+          if (response.status === 200) {
+            toastRef.current?.show({
+              severity: "info",
+              summary: "Success",
+              detail: "Room data updated successfully",
+            });
+            setIsEditMode(false);
+          }
+        })
+        .catch((error) => handleErrors(error, toastRef));
+    }
+  };
+
+  const handleUpdate = () => {
+    confirmDialog({
+      message: "Do you want to add this floor?",
+      header: "Create Floor",
+      icon: PrimeIcons.QUESTION_CIRCLE,
+      defaultFocus: "reject",
+      accept: updateRoom,
+    });
+  };
+
   const handleDeleteButtonClicked = () => {
     confirmDialog({
       message: (
@@ -82,7 +112,10 @@ const RoomSettingsTab: React.FC<Props> = ({ roomId, setVisible }) => {
   };
 
   return (
-    <form className="w-full pt-4 h-80 text-slate-100">
+    <form
+      onSubmit={handleSubmit(handleUpdate)}
+      className="w-full pt-4 h-80 text-slate-100"
+    >
       <CustomToast ref={toastRef} />
       <ScrollPanel style={{ height: "calc(72vh - 200px)" }} className="mb-5">
         <div className="flex justify-between w-full">
