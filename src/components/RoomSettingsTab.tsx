@@ -24,6 +24,7 @@ import { useQuery } from "@tanstack/react-query";
 import { confirmDialog } from "primereact/confirmdialog";
 import handleErrors from "../@utils/functions/handleErrors";
 import useFloorRoomsSignalStore from "../@utils/store/floorRoomsSignal";
+import RoomTabTemplate from "../templates/RoomTabTemplate";
 
 interface Props {
   roomId: number;
@@ -112,86 +113,85 @@ const RoomSettingsTab: React.FC<Props> = ({ roomId, setVisible }) => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(handleUpdate)}
-      className="w-full pt-4 h-80 text-slate-100"
-    >
-      <CustomToast ref={toastRef} />
-      <ScrollPanel style={{ height: "calc(72vh - 200px)" }} className="mb-5">
-        <div className="flex justify-between w-full">
-          <p className="w-full">Room name</p>
-          <IconField iconPosition="left" className="w-full">
-            <InputIcon className={PrimeIcons.HOME}> </InputIcon>
-            <InputText
-              disabled={!isEditMode}
-              {...register("name")}
-              placeholder="Room name"
-              className="w-full h-10 bg-inherit text-slate-100"
-            />
-          </IconField>
-          <div className="flex items-center justify-end w-full"></div>
-        </div>
-        <Divider />
+    <RoomTabTemplate>
+      <form onSubmit={handleSubmit(handleUpdate)} className="w-full">
+        <CustomToast ref={toastRef} />
+        <ScrollPanel style={{ height: "calc(72vh - 200px)" }} className="mb-5">
+          <div className="flex justify-between w-full">
+            <p className="w-full">Room name</p>
+            <IconField iconPosition="left" className="w-full">
+              <InputIcon className={PrimeIcons.HOME}> </InputIcon>
+              <InputText
+                disabled={!isEditMode}
+                {...register("name")}
+                placeholder="Room name"
+                className="w-full h-10 bg-inherit text-slate-100"
+              />
+            </IconField>
+            <div className="flex items-center justify-end w-full"></div>
+          </div>
+          <Divider />
 
-        <div className="flex justify-between w-full">
-          <p className="w-full">Room code</p>
-          <IconField iconPosition="left" className="w-full">
-            <InputIcon className={PrimeIcons.KEY}> </InputIcon>
-            <InputText
-              disabled={!isEditMode}
-              {...register("code")}
-              placeholder="Room code"
-              maxLength={2}
-              className="w-full h-10 bg-inherit text-slate-100"
-            />
-          </IconField>
-          <div className="flex items-center justify-end w-full"></div>
-        </div>
-      </ScrollPanel>
-      <div className={`flex justify-end gap-2`}>
-        {isEditMode && (
-          <Button
-            className="w-52"
-            severity="danger"
-            type="button"
-            icon={`${PrimeIcons.SIGN_OUT} mr-2 text-xl`}
-            onClick={() => setIsEditMode(false)}
-          >
-            Cancel
-          </Button>
-        )}
-        {isEditMode && (
-          <Button
-            className="w-52"
-            type="submit"
-            icon={`${PrimeIcons.SAVE} mr-2 text-xl`}
-          >
-            Save
-          </Button>
-        )}
-        {!isEditMode && (
-          <>
+          <div className="flex justify-between w-full">
+            <p className="w-full">Room code</p>
+            <IconField iconPosition="left" className="w-full">
+              <InputIcon className={PrimeIcons.KEY}> </InputIcon>
+              <InputText
+                disabled={!isEditMode}
+                {...register("code")}
+                placeholder="Room code"
+                maxLength={2}
+                className="w-full h-10 bg-inherit text-slate-100"
+              />
+            </IconField>
+            <div className="flex items-center justify-end w-full"></div>
+          </div>
+        </ScrollPanel>
+        <div className={`flex justify-end gap-2`}>
+          {isEditMode && (
             <Button
               className="w-52"
-              type="button"
-              onClick={() => setIsEditMode(true)}
-              icon={`${PrimeIcons.USER_EDIT} mr-2 text-xl`}
-            >
-              Edit
-            </Button>
-            <Button
-              className="w-52"
-              type="button"
               severity="danger"
-              onClick={handleDeleteButtonClicked}
-              icon={`${PrimeIcons.TRASH} mr-2 text-xl`}
+              type="button"
+              icon={`${PrimeIcons.SIGN_OUT} mr-2 text-xl`}
+              onClick={() => setIsEditMode(false)}
             >
-              Delete
+              Cancel
             </Button>
-          </>
-        )}
-      </div>
-    </form>
+          )}
+          {isEditMode && (
+            <Button
+              className="w-52"
+              type="submit"
+              icon={`${PrimeIcons.SAVE} mr-2 text-xl`}
+            >
+              Save
+            </Button>
+          )}
+          {!isEditMode && (
+            <>
+              <Button
+                className="w-52"
+                type="button"
+                onClick={() => setIsEditMode(true)}
+                icon={`${PrimeIcons.USER_EDIT} mr-2 text-xl`}
+              >
+                Edit
+              </Button>
+              <Button
+                className="w-52"
+                type="button"
+                severity="danger"
+                onClick={handleDeleteButtonClicked}
+                icon={`${PrimeIcons.TRASH} mr-2 text-xl`}
+              >
+                Delete
+              </Button>
+            </>
+          )}
+        </div>
+      </form>
+    </RoomTabTemplate>
   );
 };
 
