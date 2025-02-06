@@ -3,6 +3,7 @@ import { Stage, Layer, Arrow } from "react-konva";
 import { Stage as StageType } from "konva/lib/Stage";
 import { Button } from "primereact/button";
 import { PrimeIcons } from "primereact/api";
+import { addDirections } from "../@utils/services/roomService";
 
 interface ArrowType {
   points: number[];
@@ -77,7 +78,9 @@ const RoomCanvas = () => {
 
   const handleSave = () => {
     console.log("Arrow Data:", arrows);
-    setArrows([]);
+    addDirections(10, { directions: arrows })
+      .then((response) => console.log(response))
+      .catch((error) => console.error(error));
   };
 
   const handleUndo = () => {
