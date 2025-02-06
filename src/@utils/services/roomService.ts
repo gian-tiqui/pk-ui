@@ -33,6 +33,12 @@ const updateRoomById = async (roomId: number, name?: string, code?: string) => {
   });
 };
 
+const addDirections = async (roomId: number, directions: object) => {
+  return apiClient.post(`${URI.API_URI}/api/v1/room/${roomId}/directions`, {
+    directions,
+  });
+};
+
 const softDeleteRoomById = async (roomId: number) => {
   return apiClient.delete(`${URI.API_URI}/api/v1/room/${roomId}/soft-delete`);
 };
@@ -50,6 +56,7 @@ export {
   getRoomById,
   updateRoomById,
   softDeleteRoomById,
+  addDirections,
   retrieveRoomById,
   removeRoomById,
 };
