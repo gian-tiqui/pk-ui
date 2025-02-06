@@ -4,11 +4,16 @@ import { Panel } from "../types/types";
 import FloorSettingsPanel from "./FloorSettingsPanel";
 import RoomsPanel from "./RoomsPanel";
 import DeletedRoomsPanel from "./DeletedRoomsPanel";
+import FloorMapTab from "./FloorMapTab";
 
 const FloorPageContent = () => {
   const roomPanels: Panel[] = [
     { header: "Rooms", icon: `${PrimeIcons.HOME} me-2`, panel: <RoomsPanel /> },
-
+    {
+      header: "Floor Map",
+      icon: `${PrimeIcons.MAP} me-2`,
+      panel: <FloorMapTab />,
+    },
     {
       header: "Deleted Rooms",
       icon: `${PrimeIcons.TRASH} me-2`,

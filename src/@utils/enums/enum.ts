@@ -6,4 +6,11 @@ enum URI {
   API_URI = import.meta.env.VITE_API_URI,
 }
 
-export { Namespace, URI };
+enum ImageLocation {
+  BASE = "http://localhost:8083",
+  UPLOADS = "uploads",
+  ROOM = "room_images",
+  FLOOR = "floor_images",
+}
+
+export { Namespace, URI, ImageLocation };
