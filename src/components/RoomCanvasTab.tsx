@@ -1,9 +1,14 @@
-import { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Stage, Layer, Arrow } from "react-konva";
 import { Stage as StageType } from "konva/lib/Stage";
 import { Button } from "primereact/button";
 import { PrimeIcons } from "primereact/api";
 import { addDirections } from "../@utils/services/roomService";
+import RoomTabTemplate from "../templates/RoomTabTemplate";
+
+interface Props {
+  roomId: number;
+}
 
 interface ArrowType {
   points: number[];
@@ -17,7 +22,7 @@ const ARROW_DIMENSION = {
   fill: "white",
 };
 
-const RoomCanvas = () => {
+const RoomCanvasTab: React.FC<Props> = ({ roomId }) => {
   const stageRef = useRef<StageType | null>(null);
   const [stageSize, setStageSize] = useState({
     width: window.innerWidth * 0.8,
@@ -78,7 +83,7 @@ const RoomCanvas = () => {
 
   const handleSave = () => {
     console.log("Arrow Data:", arrows);
-    addDirections(10, { directions: arrows })
+    addDirections(roomId, { directions: arrows })
       .then((response) => console.log(response))
       .catch((error) => console.error(error));
   };
@@ -92,7 +97,7 @@ const RoomCanvas = () => {
   };
 
   return (
-    <div className="flex flex-col items-center overflow-auto h-80">
+    <RoomTabTemplate>
       <div className="flex justify-end w-full gap-2 px-4 mb-6">
         <Button
           onClick={handleSave}
@@ -129,8 +134,8 @@ const RoomCanvas = () => {
           )}
         </Layer>
       </Stage>
-    </div>
+    </RoomTabTemplate>
   );
 };
 
-export default RoomCanvas;
+export default RoomCanvasTab;

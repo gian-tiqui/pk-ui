@@ -3,8 +3,8 @@ import { TabView, TabPanel } from "primereact/tabview";
 import { Panel } from "../types/types";
 import RoomSettingsTab from "./RoomSettingsTab";
 import React, { Dispatch, SetStateAction } from "react";
-import RoomDetailsTabView from "./RoomDetailsTabView";
-import RoomCanvas from "./RoomCanvas";
+import RoomCanvasTab from "./RoomCanvasTab";
+import RoomDetailsTab from "./RoomDetailsTab";
 
 interface Props {
   roomId: number;
@@ -16,13 +16,13 @@ const RoomSettingsTabView: React.FC<Props> = ({ roomId, setVisible }) => {
     {
       header: "Details",
       icon: `${PrimeIcons.HOME} me-2`,
-      panel: <RoomDetailsTabView />,
+      panel: <RoomDetailsTab roomId={roomId} />,
     },
     { header: "Image", icon: `${PrimeIcons.IMAGE} me-2`, panel: null },
     {
       header: "Canvas",
       icon: `${PrimeIcons.IMAGES} me-2`,
-      panel: <RoomCanvas />,
+      panel: <RoomCanvasTab roomId={roomId} />,
     },
     {
       header: "Settings",

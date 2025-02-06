@@ -55,6 +55,7 @@ type Room = {
   createdAt: Date;
   updatedAt: Date;
   floor: Floor;
+  directionPattern: object;
 };
 
 type Panel = {
