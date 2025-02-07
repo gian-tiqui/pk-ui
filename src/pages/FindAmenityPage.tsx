@@ -1,87 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PageTemplate from "../templates/PageTemplate";
 import { Dialog } from "primereact/dialog";
 import { useNavigate } from "react-router-dom";
+import { Query, Room } from "../types/types";
+import { useQuery } from "@tanstack/react-query";
+import { getFloors } from "../@utils/services/floorService";
 
 const FindAmenityPage = () => {
   const navigate = useNavigate();
 
-  const details: string = "Lorem ipsum";
-  const [room, setRoom] = useState<
-    { name: string; details: string } | undefined
-  >(undefined);
+  const [room, setRoom] = useState<Room | undefined>(undefined);
+  const [query] = useState<Query>({ search: "" });
 
-  const floors: {
-    name: string;
-    rooms: { name: string; details: string }[];
-    code: string;
-  }[] = [
-    {
-      name: "Ground Floor",
-      rooms: [
-        { name: "Room 1", details },
-        { name: "Room 2", details },
-        { name: "Room 3", details },
-        { name: "Room 4", details },
-      ],
-      code: "GF",
-    },
-    {
-      name: "2nd Floor",
-      rooms: [
-        { name: "Room 1", details },
-        { name: "Room 2", details },
-        { name: "Room 3", details },
-        { name: "Room 4", details },
-      ],
+  const { data } = useQuery({
+    queryKey: [`floors-${JSON.stringify(query)}`],
+    queryFn: () => getFloors(query),
+  });
 
-      code: "2F",
-    },
-    {
-      name: "3rd Floor",
-      rooms: [
-        { name: "Room 1", details },
-        { name: "Room 2", details },
-        { name: "Room 3", details },
-        { name: "Room 4", details },
-      ],
-
-      code: "3F",
-    },
-    {
-      name: "4th Floor",
-      rooms: [
-        { name: "Room 1", details },
-        { name: "Room 2", details },
-        { name: "Room 3", details },
-        { name: "Room 4", details },
-      ],
-
-      code: "4F",
-    },
-    {
-      name: "5th Floor",
-      rooms: [
-        { name: "Room 1", details },
-        { name: "Room 2", details },
-        { name: "Room 3", details },
-        { name: "Room 4", details },
-      ],
-
-      code: "5F",
-    },
-    {
-      name: "6th Floor",
-      rooms: [
-        { name: "Room 1", details },
-        { name: "Room 2", details },
-        { name: "Room 3", details },
-        { name: "Room 4", details },
-      ],
-
-      code: "7F",
-    },
-  ];
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
 
   return (
     <PageTemplate>
@@ -123,23 +61,25 @@ const FindAmenityPage = () => {
           </div>
 
           <div className="flex flex-col gap-2">
-            {floors.map((floor, index) => (
-              <div key={index}>
-                <p className="mb-4 text-2xl font-medium">{floor.name}</p>
-                <div className="flex flex-wrap gap-2">
-                  {floor.rooms.map((room, index) => (
-                    <div
-                      onClick={() => setRoom(room)}
-                      key={index}
-                      className="p-4 border rounded hover:shadow hover:shadow-blue-400 w-44 h-44 bg-slate-900/40 border-slate-700"
-                    >
-                      <p className="text-xl">{room.name}</p>
-                      <p className="text-xl">{room.details}</p>
-                    </div>
-                  ))}
+            {data?.floors &&
+              data.floors.map((floor, index) => (
+                <div key={index}>
+                  <p className="mb-4 text-2xl font-medium">{floor.name}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {floor.rooms &&
+                      floor.rooms.map((room, index) => (
+                        <div
+                          onClick={() => setRoom(room)}
+                          key={index}
+                          className="p-4 border rounded hover:shadow hover:shadow-blue-400 w-44 h-44 bg-slate-900/40 border-slate-700"
+                        >
+                          <p className="text-xl">{room.name}</p>
+                          <p className="text-xl">{room.detail}</p>
+                        </div>
+                      ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </div>
