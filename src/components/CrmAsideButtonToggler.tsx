@@ -1,16 +1,17 @@
 import { PrimeIcons } from "primereact/api";
 import useCrmSidebarStore from "../@utils/store/crmSidebar";
+import { Button } from "primereact/button";
 
 const CrmAsideButtonToggler = () => {
   const { isExpanded, setIsExpanded } = useCrmSidebarStore();
 
   return (
-    <div
+    <Button
       onClick={() => setIsExpanded(!isExpanded)}
-      className="grid w-10 h-10 rounded-lg hover:cursor-pointer hover:bg-slate-700 place-content-center"
-    >
-      <i className={`${PrimeIcons.BARS} text-xl my-auto`}></i>
-    </div>
+      icon={`${PrimeIcons.BARS} `}
+      severity="contrast"
+      className={`w-10 h-10`}
+    ></Button>
   );
 };
 
