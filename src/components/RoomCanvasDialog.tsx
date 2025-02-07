@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ImageLocation } from "../@utils/enums/enum";
 import { getFloorById } from "../@utils/services/floorService";
 import { useParams } from "react-router-dom";
-import { ArrowType, FloorParam } from "../types/types";
+import { ArrowDimension, ArrowType, FloorParam } from "../types/types";
 import getImageFromServer from "../@utils/functions/getFloorMapImageLocation";
 import { Dialog } from "primereact/dialog";
 import { Toast } from "primereact/toast";
@@ -27,8 +27,8 @@ interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;
 }
 
-const ARROW_DIMENSION = {
-  pointerLength: 15,
+const ARROW_DIMENSION: ArrowDimension = {
+  pointerLength: 19,
   pointerWidth: 15,
   strokeWidth: 10,
   stroke: "black",
@@ -44,6 +44,19 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [currentArrow, setCurrentArrow] = useState<ArrowType | null>(null);
   const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
+  const [arrowDimension] = useState<ArrowDimension>(ARROW_DIMENSION);
+
+  // const [delayedArrows, setDelayedArrows] = useState<ArrowType[]>([]);
+
+  // useEffect(() => {
+  //   if (visible === false) return;
+  //   setDelayedArrows([]);
+  //   arrows.forEach((arrow, index) => {
+  //     setTimeout(() => {
+  //       setDelayedArrows((prevArrows) => [...prevArrows, arrow]);
+  //     }, index * 500);
+  //   });
+  // }, [arrows, visible]);
 
   const { data: floor } = useQuery({
     queryKey: [`floor-${param.floorId}`],
@@ -60,7 +73,6 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
     const setDirections = () => {
       if (room?.directionPattern) setArrows(room.directionPattern.arrows);
     };
-
     setDirections();
   }, [room]);
 
@@ -70,7 +82,6 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
         ImageLocation.FLOOR,
         floor.imageLocation
       );
-
       const img = new window.Image();
       img.src = imgSrc;
       img.onload = () => {
@@ -127,14 +138,17 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
       });
       return;
     }
-
     addDirections(roomId, { arrows })
       .then((response) => {
         if (response.status === 201) {
-          toastRef.current?.show({
-            severity: "info",
-            summary: "Success",
-            detail: "Directions updated successfully.",
+          confirmDialog({
+            message: "Directions updated successfully. Do you want to exit?",
+            header: "Success",
+            icon: PrimeIcons.QUESTION_CIRCLE,
+            defaultFocus: "reject",
+            accept: () => {
+              if (visible === true) setVisible(false);
+            },
           });
         }
       })
@@ -143,7 +157,7 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
 
   const handleSave = () => {
     confirmDialog({
-      message: "Do you want update the room's directions??",
+      message: "Do you want update the room's directions?",
       header: "Update Direction",
       icon: PrimeIcons.QUESTION_CIRCLE,
       defaultFocus: "reject",
@@ -245,10 +259,11 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
             />
 
             {arrows.map((arrow, index) => (
-              <Arrow key={index} points={arrow.points} {...ARROW_DIMENSION} />
+              <Arrow points={arrow.points} {...arrowDimension} key={index} />
             ))}
+
             {currentArrow && (
-              <Arrow points={currentArrow.points} {...ARROW_DIMENSION} />
+              <Arrow points={currentArrow.points} {...arrowDimension} />
             )}
           </Layer>
         </Stage>

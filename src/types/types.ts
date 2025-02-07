@@ -104,7 +104,16 @@ type FloorParam = {
   floorId: string;
 };
 
+type ArrowDimension = {
+  pointerLength: number;
+  pointerWidth: number;
+  strokeWidth: number;
+  stroke: string;
+  fill: string;
+};
+
 export type {
+  ArrowDimension,
   Route,
   UserData,
   Query,

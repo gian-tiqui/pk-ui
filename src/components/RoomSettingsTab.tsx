@@ -72,7 +72,7 @@ const RoomSettingsTab: React.FC<Props> = ({ roomId, setVisible }) => {
     const { name, code } = getValues();
 
     if (roomId) {
-      updateRoomById(roomId, name, code)
+      updateRoomById(roomId, { name, code })
         .then((response) => {
           if (response.status === 200) {
             toastRef.current?.show({

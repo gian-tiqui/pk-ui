@@ -5,6 +5,7 @@ import RoomSettingsTab from "./RoomSettingsTab";
 import React, { Dispatch, SetStateAction } from "react";
 import RoomCanvasTab from "./RoomCanvasTab";
 import RoomDetailsTab from "./RoomDetailsTab";
+import RoomImagesTab from "./RoomImagesTab";
 
 interface Props {
   roomId: number;
@@ -18,7 +19,11 @@ const RoomSettingsTabView: React.FC<Props> = ({ roomId, setVisible }) => {
       icon: `${PrimeIcons.HOME} me-2`,
       panel: <RoomDetailsTab roomId={roomId} />,
     },
-    { header: "Image", icon: `${PrimeIcons.IMAGE} me-2`, panel: null },
+    {
+      header: "Images",
+      icon: `${PrimeIcons.IMAGE} me-2`,
+      panel: <RoomImagesTab roomId={roomId} />,
+    },
     {
       header: "Canvas",
       icon: `${PrimeIcons.IMAGES} me-2`,

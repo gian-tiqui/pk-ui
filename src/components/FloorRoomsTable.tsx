@@ -197,8 +197,6 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
         ref={dataTableRef}
         value={data?.rooms}
         size="small"
-        // scrollable
-        // scrollHeight="320px"
         pt={{
           bodyRow: { className: "bg-slate-900" },
           headerRow: { className: "bg-slate-900" },
@@ -224,16 +222,7 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
           className="text-slate-100"
           header="Code"
         />
-        <Column
-          pt={{
-            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
-            sortIcon: { className: "text-slate-100" },
-          }}
-          sortable
-          field="detail"
-          className="text-slate-100"
-          header="Detail"
-        />
+
         <Column
           pt={{
             headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
@@ -301,6 +290,8 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
                 <Button
                   className="w-10 h-10"
                   icon={PrimeIcons.COG}
+                  tooltip="Open settings"
+                  tooltipOptions={{ position: "bottom" }}
                   onClick={() => {
                     setSelectedRoomId(rowData.id);
 
