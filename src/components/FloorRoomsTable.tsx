@@ -20,6 +20,7 @@ import {
 } from "../@utils/services/roomService";
 import handleErrors from "../@utils/functions/handleErrors";
 import { OverlayPanel } from "primereact/overlaypanel";
+import CustomToast from "./CustomToast";
 
 interface Props {
   isDeleted?: boolean;
@@ -77,6 +78,11 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
     retrieveRoomById(selectedRoomId)
       .then((response) => {
         if (response.status === 200) {
+          toastRef.current?.show({
+            severity: "info",
+            summary: "Success",
+            detail: "Room retrieved successfully",
+          });
           setFloorRoomsSignal(true);
         }
       })
@@ -125,7 +131,7 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
 
   return (
     <section>
-      <Toast ref={toastRef} />
+      <CustomToast ref={toastRef} />
       <RoomSettingsDialog
         roomId={selectedRoomId}
         visible={roomSettingVisible}

@@ -17,6 +17,7 @@ import { jwtDecode } from "jwt-decode";
 import useUserDataStore from "../@utils/store/userDataStore";
 import extractUserData from "../@utils/functions/extractUserData";
 import axios from "axios";
+import navigateUserByDeptId from "../@utils/functions/userNavigator";
 
 interface FormFields {
   employeeId: string;
@@ -26,7 +27,7 @@ interface FormFields {
 const LoginPage = () => {
   const [isActive, setIsActive] = useState<boolean>(true);
   const { setIsLoggedIn } = useLoggedInStore();
-  const { setUser } = useUserDataStore();
+  const { user, setUser } = useUserDataStore();
   const navigate = useNavigate();
   const {
     register,
@@ -36,8 +37,8 @@ const LoginPage = () => {
   const toastRef = useRef<Toast>(null);
 
   useEffect(() => {
-    if (isAuthenticated()) navigate("/amenity-management");
-  }, [navigate]);
+    if (isAuthenticated()) navigateUserByDeptId(user, navigate);
+  }, [navigate, user]);
 
   const handleLogin = async ({ employeeId, password }: FormFields) => {
     try {
@@ -81,7 +82,7 @@ const LoginPage = () => {
             summary: "Login Successful",
           });
 
-          navigate("/amenity-management");
+          navigateUserByDeptId(userData, navigate);
         }
       }
     } catch (error) {

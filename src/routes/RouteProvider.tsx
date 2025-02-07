@@ -10,6 +10,7 @@ import NotFoundPage from "../pages/NotFoundPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import FloorPage from "../pages/FloorPage";
 import QmeupPage from "../pages/QmeupPage";
+import UserManagement from "../pages/UserManagement";
 
 const RouteProvider = () => {
   const routes: RouteType[] = [
@@ -66,6 +67,12 @@ const RouteProvider = () => {
       hidden: true,
       path: "amenity-management/:floorId",
       element: <FloorPage />,
+    },
+    {
+      name: "User Management Page",
+      hidden: true,
+      path: "user-management",
+      element: <UserManagement />,
     },
   ];
 

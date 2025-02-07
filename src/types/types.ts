@@ -46,6 +46,10 @@ type Floor = {
   updatedAt: Date;
 };
 
+type ArrowType = {
+  points: number[];
+};
+
 type Room = {
   id: number;
   name: string;
@@ -55,7 +59,7 @@ type Room = {
   createdAt: Date;
   updatedAt: Date;
   floor: Floor;
-  directionPattern: object;
+  directionPattern?: { arrows: ArrowType[] };
 };
 
 type Panel = {
@@ -114,4 +118,5 @@ export type {
   Secrets,
   ForgotPassword,
   FloorParam,
+  ArrowType,
 };

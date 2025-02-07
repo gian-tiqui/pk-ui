@@ -13,4 +13,10 @@ enum ImageLocation {
   FLOOR = "floor_images",
 }
 
-export { Namespace, URI, ImageLocation };
+enum Department {
+  IT = 3,
+  MRKT = 4,
+  SSD = 8,
+}
+
+export { Namespace, URI, ImageLocation, Department };

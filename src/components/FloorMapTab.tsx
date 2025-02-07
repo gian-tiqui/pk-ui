@@ -10,6 +10,7 @@ import apiClient from "../@utils/http-common/apiClient";
 import { Toast } from "primereact/toast";
 import CustomToast from "./CustomToast";
 import handleErrors from "../@utils/functions/handleErrors";
+import getImageFromServer from "../@utils/functions/getFloorMapImageLocation";
 
 const FloorMapTab = () => {
   const param = useParams() as FloorParam;
@@ -24,16 +25,57 @@ const FloorMapTab = () => {
 
   useEffect(() => {
     if (floor && floor.imageLocation) {
-      setImageLocation(
-        `${ImageLocation.BASE}/${ImageLocation.UPLOADS}/${ImageLocation.FLOOR}/${floor?.imageLocation}`
+      const uriPath = getImageFromServer(
+        ImageLocation.FLOOR,
+        floor.imageLocation
       );
+
+      setImageLocation(uriPath);
     }
   }, [floor, imageLocation]);
 
+  if (!floor) return <p></p>;
+
   if (!floor?.imageLocation) {
     return (
-      <div className="text-slate-100">
-        <p>No map yet.</p>
+      <div className="grid text-center text-slate-100 h-96 place-content-center">
+        <div>
+          <h4 className="mb-4 text-lg font-medium">
+            No map image has been set yet.
+          </h4>
+          <FileUpload
+            ref={fileUploadRef}
+            mode="basic"
+            accept="image/*"
+            customUpload
+            uploadHandler={(event) => {
+              const formData = new FormData();
+
+              const map = event.files[0];
+
+              formData.append("file", map);
+
+              apiClient
+                .post(
+                  `${URI.API_URI}/api/v1/floor/${floor?.id}/upload`,
+                  formData
+                )
+                .then((response) => {
+                  if (response.status === 201) {
+                    toastRef.current?.show({
+                      severity: "info",
+                      summary: "Success",
+                      detail: "File uploaded successfully",
+                    });
+                    fileUploadRef.current?.clear();
+
+                    refetch();
+                  }
+                })
+                .catch((error) => handleErrors(error, toastRef));
+            }}
+          />
+        </div>
       </div>
     );
   }
@@ -46,35 +88,6 @@ const FloorMapTab = () => {
       </div>
       <div className="text-slate-100">
         <p>File Name: {imageLocation.split("-")[3]}</p>
-        <FileUpload
-          ref={fileUploadRef}
-          mode="basic"
-          accept="image/*"
-          customUpload
-          uploadHandler={(event) => {
-            const formData = new FormData();
-
-            const map = event.files[0];
-
-            formData.append("file", map);
-
-            apiClient
-              .post(`${URI.API_URI}/api/v1/floor/${floor.id}/upload`, formData)
-              .then((response) => {
-                if (response.status === 201) {
-                  toastRef.current?.show({
-                    severity: "info",
-                    summary: "Success",
-                    detail: "File uploaded successfully",
-                  });
-                  fileUploadRef.current?.clear();
-
-                  refetch();
-                }
-              })
-              .catch((error) => handleErrors(error, toastRef));
-          }}
-        />
       </div>
     </div>
   );
