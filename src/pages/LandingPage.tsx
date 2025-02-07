@@ -5,14 +5,17 @@ import { useNavigate } from "react-router-dom";
 import HiddenLoginButton from "../components/HiddenLoginButton";
 import useLoggedInStore from "../@utils/store/loggedIn";
 import { useEffect } from "react";
+import useUserDataStore from "../@utils/store/userDataStore";
+import navigateUserByDeptId from "../@utils/functions/userNavigator";
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useLoggedInStore();
+  const { user } = useUserDataStore();
 
   useEffect(() => {
-    if (isLoggedIn) navigate("/amenity-management");
-  }, [isLoggedIn, navigate]);
+    if (isLoggedIn) navigateUserByDeptId(user, navigate);
+  }, [isLoggedIn, navigate, user]);
 
   return (
     <PageTemplate>

@@ -1,9 +1,4 @@
-import { PrimeIcons } from "primereact/api";
-import { IconField } from "primereact/iconfield";
-import { InputIcon } from "primereact/inputicon";
-import { InputText } from "primereact/inputtext";
 import { ScrollPanel } from "primereact/scrollpanel";
-import FloorItem from "./FloorItem";
 import { useQuery } from "@tanstack/react-query";
 import React, {
   Dispatch,
@@ -15,8 +10,11 @@ import React, {
 import { getFloors } from "../@utils/services/floorService";
 import { Query } from "../types/types";
 import useCrmSidebarSignalStore from "../@utils/store/crmSidebarSectionSignal";
-import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
+import useUserDataStore from "../@utils/store/userDataStore";
+import { Department } from "../@utils/enums/enum";
+import CrmMarketingSidebarSection from "./CrmMarketingSidebarSection";
+import ITSidebarSection from "./ITSidebarSection";
 
 interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;
@@ -29,6 +27,7 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
   const { refresh, setRefresh } = useCrmSidebarSignalStore();
   const scrollPanelRef = useRef<ScrollPanel>(null);
   const navigate = useNavigate();
+  const { user } = useUserDataStore();
 
   const { data, refetch, isError, isLoading } = useQuery({
     queryKey: [`floors-${JSON.stringify(query)}`],
@@ -92,63 +91,33 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
     refetch();
   }, [query, refetch]);
 
-  return (
-    <section className="flex-1 overflow-hidden">
-      <div className="py-2 mx-5">
-        <Button
-          onClick={() => navigate("/amenity-management")}
-          className="w-full h-10 px-3"
-          icon={`${PrimeIcons.HOME} mr-3 text-lg`}
-        >
-          Home
-        </Button>
-      </div>
-      <IconField iconPosition="left" className="mx-5 mt-2 mb-5">
-        <InputIcon className="pi pi-search"> </InputIcon>
-        <InputText
-          placeholder="Search"
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="h-10 border-slate-700 bg-slate-800 text-slate-100"
+  switch (user?.deptId) {
+    case Department.IT: {
+      return <ITSidebarSection />;
+      break;
+    }
+    case Department.MRKT: {
+      return (
+        <CrmMarketingSidebarSection
+          data={data}
+          isError={isError}
+          isLoading={isLoading}
+          navigate={navigate}
+          scrollPanelRef={scrollPanelRef}
+          selectedId={selectedId}
+          setSearchTerm={setSearchTerm}
+          setSelectedId={setSelectedId}
+          setVisible={setVisible}
         />
-      </IconField>
-      <div className="flex items-center justify-between h-10 mx-5">
-        <small className="text-sm">Floors</small>
-        <div
-          onClick={() => setVisible(true)}
-          className="flex items-center gap-2 hover:cursor-pointer hover:border-b"
-        >
-          <i className={`${PrimeIcons.PLUS} text-xs`}></i>
-          <p className="text-sm">Add Floor</p>
-        </div>
-      </div>
-      <ScrollPanel
-        ref={scrollPanelRef}
-        className={`pb-36 ms-5 ${
-          data?.floors && data?.floors?.length > 6 ? "me-1" : "me-5"
-        }`}
-        style={{ height: "calc(100vh - 250px)" }}
-      >
-        {isLoading && <small className="text-slate-100">Loading floors</small>}
-        {isError && (
-          <small className="text-slate-100">
-            There was a problem in loading the floors
-          </small>
-        )}
-        {data?.floors && data?.floors.length === 0 ? (
-          <small className="text-slate-100">No floors yet</small>
-        ) : (
-          data?.floors?.map((floor) => (
-            <FloorItem
-              key={floor.id}
-              {...floor}
-              selectedId={selectedId}
-              setSelectedId={setSelectedId}
-            />
-          ))
-        )}
-      </ScrollPanel>
-    </section>
-  );
+      );
+    }
+    case Department.SSD: {
+      break;
+    }
+    default: {
+      break;
+    }
+  }
 };
 
 export default CrmSidebarSection;
