@@ -38,6 +38,13 @@ const updateRoomById = async (
   });
 };
 
+const uploadRoomPhotos = (roomId: number, formData: FormData) => {
+  return apiClient.post(
+    `${URI.API_URI}/api/v1/room/${roomId}/upload`,
+    formData
+  );
+};
+
 const addDirections = async (roomId: number, directions: object) => {
   return apiClient.post(`${URI.API_URI}/api/v1/room/${roomId}/directions`, {
     directions,
@@ -64,4 +71,5 @@ export {
   addDirections,
   retrieveRoomById,
   removeRoomById,
+  uploadRoomPhotos,
 };
