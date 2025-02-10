@@ -18,6 +18,7 @@ import useUserDataStore from "../@utils/store/userDataStore";
 import extractUserData from "../@utils/functions/extractUserData";
 import axios from "axios";
 import navigateUserByDeptId from "../@utils/functions/userNavigator";
+import CustomToast from "../components/CustomToast";
 
 interface FormFields {
   employeeId: string;
@@ -141,10 +142,7 @@ const LoginPage = () => {
 
   return (
     <PageTemplate>
-      <Toast
-        ref={toastRef}
-        pt={{ content: { className: "h-full backdrop-blur" } }}
-      />
+      <CustomToast ref={toastRef} />
       <main className="grid h-full place-content-center">
         <form
           onSubmit={handleSubmit(handleLogin)}

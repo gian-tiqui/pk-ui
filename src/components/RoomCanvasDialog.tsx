@@ -5,7 +5,7 @@ import React, {
   Dispatch,
   SetStateAction,
 } from "react";
-import { Stage, Layer, Arrow, Image } from "react-konva";
+import { Stage, Layer, Arrow, Image, Text } from "react-konva";
 import { Stage as StageType } from "konva/lib/Stage";
 import { Button } from "primereact/button";
 import { PrimeIcons } from "primereact/api";
@@ -62,6 +62,12 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
     queryKey: [`floor-${param.floorId}`],
     queryFn: () => getFloorById(+param.floorId),
   });
+
+  const getArrowMidpoint = (points: number[]) => {
+    const midX = (points[0] + points[2]) / 2;
+    const midY = (points[1] + points[3]) / 2;
+    return { midX, midY };
+  };
 
   const { data: room } = useQuery({
     queryKey: [`room-${roomId}`],
@@ -258,9 +264,24 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
               height={stageSize.height}
             />
 
-            {arrows.map((arrow, index) => (
-              <Arrow points={arrow.points} {...arrowDimension} key={index} />
-            ))}
+            {arrows.map((arrow, index) => {
+              const { midX, midY } = getArrowMidpoint(arrow.points);
+
+              return (
+                <React.Fragment key={index}>
+                  <Arrow points={arrow.points} {...arrowDimension} />
+
+                  <Text
+                    x={midX + 10}
+                    y={midY - 20}
+                    text={`${index + 1}`}
+                    fontSize={15}
+                    fill="black"
+                    align="center"
+                  />
+                </React.Fragment>
+              );
+            })}
 
             {currentArrow && (
               <Arrow points={currentArrow.points} {...arrowDimension} />

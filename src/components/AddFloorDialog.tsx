@@ -11,6 +11,7 @@ import { Toast } from "primereact/toast";
 import handleErrors from "../@utils/functions/handleErrors";
 import useCrmSidebarSignalStore from "../@utils/store/crmSidebarSectionSignal";
 import { confirmDialog } from "primereact/confirmdialog";
+import CustomToast from "./CustomToast";
 
 interface Props {
   visible: boolean;
@@ -83,10 +84,7 @@ const AddFloorDialog: React.FC<Props> = ({ visible, onHide, setVisible }) => {
 
   return (
     <>
-      <Toast
-        ref={toastRef}
-        pt={{ content: { className: "h-full backdrop-blur" } }}
-      />
+      <CustomToast ref={toastRef} />
       <Dialog
         header="Add a floor"
         visible={visible}

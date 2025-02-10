@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { changePassword } from "../@utils/services/authService";
 import handleErrors from "../@utils/functions/handleErrors";
 import { useNavigate } from "react-router-dom";
+import CustomToast from "./CustomToast";
 
 interface Props {
   visible: boolean;
@@ -96,10 +97,7 @@ const ChangePasswordDialog: React.FC<Props> = ({ onHide, visible, userId }) => {
 
   return (
     <>
-      <Toast
-        ref={toastRef}
-        pt={{ content: { className: "h-full backdrop-blur" } }}
-      />
+      <CustomToast ref={toastRef} />
       <Dialog
         header="Change Password"
         visible={visible}

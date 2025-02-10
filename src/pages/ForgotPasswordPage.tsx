@@ -16,6 +16,7 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { forgotPassword } from "../@utils/services/authService";
 import handleErrors from "../@utils/functions/handleErrors";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
+import CustomToast from "../components/CustomToast";
 
 const ForgotPasswordPage = () => {
   const toastRef = useRef<Toast>(null);
@@ -117,10 +118,7 @@ const ForgotPasswordPage = () => {
           },
         }}
       />
-      <Toast
-        ref={toastRef}
-        pt={{ content: { className: "h-full backdrop-blur" } }}
-      />
+      <CustomToast ref={toastRef} />
       <main className="grid h-full place-content-center">
         <form
           onSubmit={handleSubmit(onSubmit)}

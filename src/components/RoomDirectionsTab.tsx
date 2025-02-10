@@ -1,25 +1,25 @@
 import React, { useEffect, useRef, useState } from "react";
 import RoomTabTemplate from "../templates/RoomTabTemplate";
-import { useQuery } from "@tanstack/react-query";
-import { getRoomById, updateRoomById } from "../@utils/services/roomService";
-import { InputTextarea } from "primereact/inputtextarea";
-import { Button } from "primereact/button";
 import { PrimeIcons } from "primereact/api";
-import { useForm } from "react-hook-form";
-import { confirmDialog } from "primereact/confirmdialog";
-import handleErrors from "../@utils/functions/handleErrors";
-import { Toast } from "primereact/toast";
+import { Button } from "primereact/button";
+import { InputTextarea } from "primereact/inputtextarea";
 import CustomToast from "./CustomToast";
+import { useQuery } from "@tanstack/react-query";
+import { Toast } from "primereact/toast";
+import { useForm } from "react-hook-form";
+import handleErrors from "../@utils/functions/handleErrors";
+import { getRoomById, updateRoomById } from "../@utils/services/roomService";
+import { confirmDialog } from "primereact/confirmdialog";
 
 interface Props {
   roomId: number;
 }
 
 interface FormFields {
-  detail: string | undefined;
+  direction: string | undefined;
 }
 
-const RoomDetailsTab: React.FC<Props> = ({ roomId }) => {
+const RoomDirectionsTab: React.FC<Props> = ({ roomId }) => {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const toastRef = useRef<Toast>(null);
   const {
@@ -34,27 +34,27 @@ const RoomDetailsTab: React.FC<Props> = ({ roomId }) => {
   const { register, setValue, handleSubmit, getValues } = useForm<FormFields>();
 
   useEffect(() => {
-    const setDetails = () => {
+    const setdirections = () => {
       if (room) {
-        setValue("detail", room.detail);
+        setValue("direction", room.direction);
       }
     };
 
-    setDetails();
+    setdirections();
   }, [room, setValue]);
 
   const accept = () => {
     if (!roomId) return;
 
-    const { detail } = getValues();
+    const { direction } = getValues();
 
-    updateRoomById(roomId, { detail })
+    updateRoomById(roomId, { direction })
       .then((response) => {
         if (response.status === 200) {
           toastRef.current?.show({
             severity: "info",
             summary: "Success",
-            detail: "Room details updated.",
+            detail: "Room directions updated.",
           });
 
           refetch();
@@ -81,12 +81,12 @@ const RoomDetailsTab: React.FC<Props> = ({ roomId }) => {
       <CustomToast ref={toastRef} />
       <h4 className="font-medium text-slate-100">
         <i className={`${PrimeIcons.INFO_CIRCLE} me-2`}></i>
-        Add the room details and services here
+        Add the room direction instructions here
       </h4>
       <form className="w-full p-1" onSubmit={handleSubmit(onSubmit)}>
         <InputTextarea
           disabled={!isEditMode}
-          {...register("detail")}
+          {...register("direction")}
           className="w-full mb-2 h-52 bg-slate-800 border-slate-600 text-slate-100"
         />
         <div className="flex justify-end w-full gap-2">
@@ -128,4 +128,4 @@ const RoomDetailsTab: React.FC<Props> = ({ roomId }) => {
   );
 };
 
-export default RoomDetailsTab;
+export default RoomDirectionsTab;

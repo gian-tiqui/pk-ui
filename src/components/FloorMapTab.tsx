@@ -4,7 +4,7 @@ import { FloorParam } from "../types/types";
 import { useQuery } from "@tanstack/react-query";
 import { getFloorById } from "../@utils/services/floorService";
 import { ImageLocation, URI } from "../@utils/enums/enum";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { FileUpload, FileUploadHandlerEvent } from "primereact/fileupload";
 import apiClient from "../@utils/http-common/apiClient";
 import { Toast } from "primereact/toast";
@@ -13,12 +13,14 @@ import handleErrors from "../@utils/functions/handleErrors";
 import getImageFromServer from "../@utils/functions/getFloorMapImageLocation";
 import { PrimeIcons } from "primereact/api";
 import { confirmDialog } from "primereact/confirmdialog";
+import useCrmSidebarSignalStore from "../@utils/store/crmSidebarSectionSignal";
 
 const FloorMapTab = () => {
   const param = useParams() as FloorParam;
   const fileUploadRef = useRef<FileUpload>(null);
   const toastRef = useRef<Toast>(null);
   const [imageLocation, setImageLocation] = useState<string>("");
+  const { setRefresh } = useCrmSidebarSignalStore();
 
   const { data: floor, refetch } = useQuery({
     queryKey: [`floor-${param.floorId}`],
@@ -37,6 +39,7 @@ const FloorMapTab = () => {
           });
           fileUploadRef.current?.clear();
 
+          setRefresh(true);
           refetch();
         }
       })
@@ -50,15 +53,19 @@ const FloorMapTab = () => {
 
     formData.append("file", map);
 
+    const pElement: ReactNode = floor?.imageLocation ? (
+      <p className="text-slate-100">
+        This is an <span className="text-red-500">explosive action</span>,
+        updating the floor map <br />
+        <span className="text-red-500">will remove the directions</span> in the
+        rooms of this floor. <br /> Do you want to continue?
+      </p>
+    ) : (
+      <p>Set this floor map?</p>
+    );
+
     confirmDialog({
-      message: (
-        <p className="text-slate-100">
-          This is an <span className="text-red-500">explosive action</span>,
-          updating the floor map <br />
-          <span className="text-red-500">will remove the directions</span> in
-          the rooms of this floors. <br /> Do you want to continue?
-        </p>
-      ),
+      message: pElement,
       header: "Update the floor map?",
       icon: PrimeIcons.QUESTION_CIRCLE,
       defaultFocus: "reject",
