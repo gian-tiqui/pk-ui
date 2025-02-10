@@ -15,6 +15,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FloorParam } from "../types/types";
 import useCrmSidebarSignalStore from "../@utils/store/crmSidebarSectionSignal";
 import { softDeleteFloorById } from "../@utils/services/floorService";
+import CustomToast from "./CustomToast";
 
 interface Props {
   visible: boolean;
@@ -89,7 +90,7 @@ const DeleteFloorDialog: React.FC<Props> = ({ visible, setVisible }) => {
 
   return (
     <>
-      <Toast ref={toastRef} />
+      <CustomToast ref={toastRef} />
       <Dialog
         pt={{
           header: {

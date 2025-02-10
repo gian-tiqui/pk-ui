@@ -28,12 +28,13 @@ const getRoomById = async (roomId: number): Promise<Room | undefined> => {
 
 const updateRoomById = async (
   roomId: number,
-  payload: { name?: string; code?: string; detail?: string }
+  payload: { name?: string; code?: string; detail?: string; direction?: string }
 ) => {
   return apiClient.patch(`${URI.API_URI}/api/v1/room/${roomId}`, {
     name: payload.name,
     code: payload.code,
     detail: payload.detail,
+    direction: payload.direction,
   });
 };
 

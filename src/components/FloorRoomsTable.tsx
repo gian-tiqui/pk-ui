@@ -44,6 +44,8 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
   const [searchInput, setSearchInput] = useState<string>("");
   const { floorRoomsSignal, setFloorRoomsSignal } = useFloorRoomsSignalStore();
   const [selectedRoomId, setSelectedRoomId] = useState<number>(-1);
+  const [isPrevDisabled, setIsPrevDisabled] = useState(true);
+  const [isNextDisabled, setIsNextDisabled] = useState(false);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -70,9 +72,32 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
     return () => setFloorRoomsSignal(false);
   }, [refetchFloorRooms, setFloorRoomsSignal, floorRoomsSignal]);
 
-  const handleNextPageClicked = () => {};
+  useEffect(() => {
+    const totalRooms = data?.count ?? 0;
+    const currentOffset = query.offset ?? 0;
+    const limit = query.limit ?? 5;
 
-  const handlePrevPageClicked = () => {};
+    setIsPrevDisabled(currentOffset === 0);
+    setIsNextDisabled(currentOffset + limit >= totalRooms);
+  }, [query.offset, data?.count, query.limit]);
+
+  const handleNextPageClicked = () => {
+    if (isNextDisabled) return;
+
+    setQuery((prev) => ({
+      ...prev,
+      offset: (prev.offset ?? 0) + (prev.limit ?? 5),
+    }));
+  };
+
+  const handlePrevPageClicked = () => {
+    if (isPrevDisabled) return;
+
+    setQuery((prev) => ({
+      ...prev,
+      offset: Math.max((prev.offset ?? 0) - (prev.limit ?? 5), 0),
+    }));
+  };
 
   const accept = () => {
     retrieveRoomById(selectedRoomId)
@@ -146,18 +171,22 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
         <div className="flex justify-end w-full gap-2 mb-4">
           <Button
             className="w-10 h-10"
-            icon={`${PrimeIcons.BACKWARD}`}
+            icon={PrimeIcons.BACKWARD}
             tooltip="Previous Page"
             tooltipOptions={{ position: "bottom" }}
             onClick={handlePrevPageClicked}
-          ></Button>
+            disabled={isPrevDisabled}
+          />
+
           <Button
             className="w-10 h-10"
-            icon={`${PrimeIcons.FORWARD}`}
+            icon={PrimeIcons.FORWARD}
             tooltip="Next Page"
             tooltipOptions={{ position: "bottom" }}
             onClick={handleNextPageClicked}
-          ></Button>
+            disabled={isNextDisabled}
+          />
+
           <IconField iconPosition="left">
             <InputIcon className="pi pi-search"> </InputIcon>
             <InputText
@@ -167,18 +196,7 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
               className="h-10 border bg-inherit border-slate-600 text-slate-100"
             />
           </IconField>
-          {!isDeleted && (
-            <Button
-              className="w-10 h-10"
-              severity="warning"
-              icon={`${PrimeIcons.EXCLAMATION_TRIANGLE}`}
-              tooltip="Rooms with incomplete data"
-              tooltipOptions={{ position: "bottom" }}
-              onClick={() => {
-                setQuery((prev) => ({ ...prev, isIncomplete: true }));
-              }}
-            ></Button>
-          )}
+
           <Button
             className="w-10 h-10"
             tooltip="Clear Filters"
@@ -222,7 +240,16 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
           className="text-slate-100"
           header="Code"
         />
-
+        <Column
+          pt={{
+            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
+            sortIcon: { className: "text-slate-100" },
+          }}
+          sortable
+          field="status"
+          className="text-slate-100"
+          header="Status"
+        />
         <Column
           pt={{
             headerCell: { className: "bg-slate-950 h-14 text-slate-100" },

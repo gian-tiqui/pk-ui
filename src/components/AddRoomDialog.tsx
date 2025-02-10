@@ -13,6 +13,7 @@ import { useParams } from "react-router-dom";
 import { createRoom } from "../@utils/services/roomService";
 import useFloorRoomsSignalStore from "../@utils/store/floorRoomsSignal";
 import { FloorParam } from "../types/types";
+import CustomToast from "./CustomToast";
 
 interface Props {
   visible: boolean;
@@ -73,10 +74,7 @@ const AddRoomDialog: React.FC<Props> = ({ visible, setVisible }) => {
 
   return (
     <>
-      <Toast
-        ref={toastRef}
-        pt={{ content: { className: "h-full backdrop-blur" } }}
-      />
+      <CustomToast ref={toastRef} />
       <Dialog
         header="Add a room"
         visible={visible}
