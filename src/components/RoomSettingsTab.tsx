@@ -140,7 +140,7 @@ const RoomSettingsTab: React.FC<Props> = ({ roomId, setVisible }) => {
                 disabled={!isEditMode}
                 {...register("code")}
                 placeholder="Room code"
-                maxLength={2}
+                maxLength={5}
                 className="w-full h-10 bg-inherit text-slate-100"
               />
             </IconField>

@@ -1,4 +1,4 @@
-import { Room } from "../../types/types";
+import { Query, Room } from "../../types/types";
 import { URI } from "../enums/enum";
 import apiClient from "../http-common/apiClient";
 
@@ -38,10 +38,23 @@ const updateRoomById = async (
   });
 };
 
+const uploadRoomPhotos = (roomId: number, formData: FormData) => {
+  return apiClient.post(
+    `${URI.API_URI}/api/v1/room/${roomId}/upload`,
+    formData
+  );
+};
+
 const addDirections = async (roomId: number, directions: object) => {
   return apiClient.post(`${URI.API_URI}/api/v1/room/${roomId}/directions`, {
     directions,
   });
+};
+
+const getRoomPhotos = async (roomId: number, query: Query) => {
+  return apiClient.get(
+    `${URI.API_URI}/api/v1/room/${roomId}/photos?limit=${query.limit}&offset=${query.offset}&isDeleted=${query.isDeleted}`
+  );
 };
 
 const softDeleteRoomById = async (roomId: number) => {
@@ -64,4 +77,6 @@ export {
   addDirections,
   retrieveRoomById,
   removeRoomById,
+  uploadRoomPhotos,
+  getRoomPhotos,
 };

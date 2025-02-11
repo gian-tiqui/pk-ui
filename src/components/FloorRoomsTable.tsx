@@ -14,13 +14,11 @@ import { InputIcon } from "primereact/inputicon";
 import RoomSettingsDialog from "./RoomSettingsDialog";
 import { Toast } from "primereact/toast";
 import { confirmDialog } from "primereact/confirmdialog";
-import {
-  removeRoomById,
-  retrieveRoomById,
-} from "../@utils/services/roomService";
+import { retrieveRoomById } from "../@utils/services/roomService";
 import handleErrors from "../@utils/functions/handleErrors";
 import { OverlayPanel } from "primereact/overlaypanel";
 import CustomToast from "./CustomToast";
+import DeleteRoomDialog from "./DeleteRoomDialog";
 
 interface Props {
   isDeleted?: boolean;
@@ -46,6 +44,7 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
   const [selectedRoomId, setSelectedRoomId] = useState<number>(-1);
   const [isPrevDisabled, setIsPrevDisabled] = useState(true);
   const [isNextDisabled, setIsNextDisabled] = useState(false);
+  const [visible, setVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -116,7 +115,12 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
 
   const handleRetrieveFloorButtonClicked = () => {
     confirmDialog({
-      message: "Do you want to retrieve this room?",
+      message: (
+        <p>
+          Do you want to <span className="text-blue-400">retrieve</span> this
+          room?
+        </p>
+      ),
       header: "Retrieve Room",
       icon: PrimeIcons.QUESTION_CIRCLE,
       defaultFocus: "reject",
@@ -125,18 +129,7 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
   };
 
   const acceptRemoveRoom = () => {
-    removeRoomById(selectedRoomId)
-      .then((response) => {
-        if (response.status === 200) {
-          toastRef.current?.show({
-            severity: "info",
-            summary: "Success",
-            detail: "Room deleted successfully",
-          });
-          setFloorRoomsSignal(true);
-        }
-      })
-      .catch((error) => handleErrors(error, toastRef));
+    setVisible(true);
   };
 
   const handleRemoveFloorButtonClicked = () => {
@@ -161,6 +154,11 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
         roomId={selectedRoomId}
         visible={roomSettingVisible}
         setVisible={setRoomSettingVisisble}
+      />
+      <DeleteRoomDialog
+        visible={visible}
+        setVisible={setVisible}
+        selectedRoomId={selectedRoomId}
       />
       <div className="flex items-center justify-between">
         <div className="flex items-center w-full">

@@ -58,6 +58,7 @@ const RoomDirectionsTab: React.FC<Props> = ({ roomId }) => {
           });
 
           refetch();
+          setIsEditMode(false);
         }
       })
       .catch((error) => handleErrors(error, toastRef));

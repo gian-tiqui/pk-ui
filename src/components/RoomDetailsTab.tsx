@@ -56,7 +56,7 @@ const RoomDetailsTab: React.FC<Props> = ({ roomId }) => {
             summary: "Success",
             detail: "Room details updated.",
           });
-
+          setIsEditMode(false);
           refetch();
         }
       })
