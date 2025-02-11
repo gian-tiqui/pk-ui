@@ -7,7 +7,7 @@ interface Props {
 
 const AmenityManagementPageHeader: React.FC<Props> = ({ user }) => {
   return (
-    <header className="mt-16 mb-14">
+    <header className="mt-4 mb-14">
       <h4 className="text-3xl text-center">
         Welcome back, <span className="text-blue-400">{user?.firstName}</span>
       </h4>
