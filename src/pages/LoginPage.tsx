@@ -216,12 +216,14 @@ const LoginPage = () => {
               )}
             </div>
           </div>
-          <Link
-            to={"/forgot-password"}
-            className="w-full text-sm text-blue-400 hover:text-blue-600 hover:underline"
-          >
-            <p className="text-end">Forgot password?</p>
-          </Link>
+          <div className="flex justify-end w-full">
+            <Link
+              to={"/forgot-password"}
+              className="text-sm text-blue-400 text-end hover:text-blue-600 hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
           <Button
             className="flex justify-center w-full gap-3 font-bold"
             type="submit"
