@@ -11,6 +11,7 @@ import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import FloorPage from "../pages/FloorPage";
 import QmeupPage from "../pages/QmeupPage";
 import UserManagement from "../pages/UserManagement";
+import MapNavigator from "../pages/Playground";
 
 const RouteProvider = () => {
   const routes: RouteType[] = [
@@ -73,6 +74,12 @@ const RouteProvider = () => {
       hidden: true,
       path: "user-management",
       element: <UserManagement />,
+    },
+    {
+      name: "Playground",
+      hidden: true,
+      path: "playground",
+      element: <MapNavigator />,
     },
   ];
 
