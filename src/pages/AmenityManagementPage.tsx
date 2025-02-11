@@ -7,6 +7,8 @@ import isSessionExpired from "../@utils/functions/isSessionExpired";
 import { Dialog } from "primereact/dialog";
 import { Namespace } from "../@utils/enums/enum";
 import Cookies from "js-cookie";
+import AmenityManagementPageHeader from "../components/AmenityManagementPageHeader";
+import AmenityManagementPageSection from "../components/AmenityManagementPageSection";
 
 const AmenityManagementPage = () => {
   const navigate = useNavigate();
@@ -72,16 +74,8 @@ const AmenityManagementPage = () => {
         </p>
       </Dialog>
       <main className="p-10 overflow-y-auto font-medium">
-        <header className="mt-16 mb-14">
-          <h4 className="text-3xl text-center">
-            Welcome back,{" "}
-            <span className="text-blue-400">{user?.firstName}</span>
-          </h4>
-        </header>
-        <section className="flex flex-col mb-6">
-          <small className="text-slate-300">Recently added floors</small>
-          <small className="text-slate-300">Floors without rooms</small>
-        </section>
+        <AmenityManagementPageHeader user={user} />
+        <AmenityManagementPageSection />
       </main>
     </PageTemplate>
   );

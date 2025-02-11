@@ -12,6 +12,7 @@ import handleErrors from "../@utils/functions/handleErrors";
 import useCrmSidebarSignalStore from "../@utils/store/crmSidebarSectionSignal";
 import { confirmDialog } from "primereact/confirmdialog";
 import CustomToast from "./CustomToast";
+import useAmenityMainSignalStore from "../@utils/store/amenityMain";
 
 interface Props {
   visible: boolean;
@@ -27,6 +28,8 @@ interface FormFields {
 
 const AddFloorDialog: React.FC<Props> = ({ visible, onHide, setVisible }) => {
   const toastRef = useRef<Toast>(null);
+  const { setRefreshMain } = useAmenityMainSignalStore();
+
   const {
     register,
     formState: { errors },
@@ -50,6 +53,7 @@ const AddFloorDialog: React.FC<Props> = ({ visible, onHide, setVisible }) => {
             detail: message,
           });
 
+          setRefreshMain(true);
           setRefresh(true);
           reset();
           setVisible(false);
