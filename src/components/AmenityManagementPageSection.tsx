@@ -10,13 +10,21 @@ import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 
 const AmenityManagementPageSection: React.FC = () => {
-  const [query] = useState<Query>({ search: "" });
+  const [query, setQuery] = useState<Query>({ search: "" });
   const { refreshMain, setRefreshMain } = useAmenityMainSignalStore();
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setQuery((prev) => ({ ...prev, search: searchTerm }));
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   const { data, refetch } = useQuery({
     queryKey: [`floors-${JSON.stringify(query)}`],
     queryFn: () => getFloors(query),
-    enabled: query !== undefined,
   });
 
   useEffect(() => {
@@ -25,13 +33,20 @@ const AmenityManagementPageSection: React.FC = () => {
     return () => setRefreshMain(false);
   }, [refreshMain, refetch, setRefreshMain]);
 
+  useEffect(() => {
+    refetch();
+  }, [query, refetch]);
+
   return (
     <section className="flex flex-col mb-6">
       <IconField iconPosition="left" className="mb-6">
         <InputIcon className="pi pi-search"> </InputIcon>
         <InputText
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+          }}
           placeholder="Search"
-          className="border bg-inherit border-slate-600 bg-slate-800 text-slate-100"
+          className="border bg-inherit w-72 border-slate-600 bg-slate-900 text-slate-100"
         />
       </IconField>
 
