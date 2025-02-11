@@ -114,6 +114,7 @@ type ArrowDimension = {
 };
 
 type RoomImage = {
+  id: number;
   imageLocation: string;
 };
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PageTemplate from "../templates/PageTemplate";
 import { Dialog } from "primereact/dialog";
 import { useNavigate } from "react-router-dom";
@@ -16,10 +16,6 @@ const FindAmenityPage = () => {
     queryKey: [`floors-${JSON.stringify(query)}`],
     queryFn: () => getFloors(query),
   });
-
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
 
   return (
     <PageTemplate>

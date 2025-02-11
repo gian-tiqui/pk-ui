@@ -17,6 +17,8 @@ import { ImageLocation } from "../@utils/enums/enum";
 import { Galleria } from "primereact/galleria";
 import { Button } from "primereact/button";
 import { PrimeIcons } from "primereact/api";
+import { Image } from "primereact/image";
+import CustomToast from "./CustomToast";
 
 interface Props {
   visible: boolean;
@@ -58,7 +60,9 @@ const RoomImageDialog: React.FC<Props> = ({
     isDeleted: false,
   });
   const [imageLocationsStr, setImageLocationStr] = useState<string[]>([]);
+  const [imageObjs, setImageObjs] = useState<RoomImage[]>([]);
   const galleriaRef = useRef<Galleria>(null);
+  const [selectedImageIds, setSelectedImageIds] = useState<number[]>([]);
 
   const toastRef = useRef<Toast>(null);
 
@@ -76,7 +80,8 @@ const RoomImageDialog: React.FC<Props> = ({
               getImageFromServer(ImageLocation.ROOM, image.imageLocation)
             )
           );
-
+          console.log(response.data);
+          setImageObjs(response.data.images);
           setImageLocationStr(tempImgLocations);
         })
         .catch((error) => handleErrors(error, toastRef));
@@ -84,6 +89,33 @@ const RoomImageDialog: React.FC<Props> = ({
 
     fetchPhotos();
   }, [roomId, query]);
+
+  const handleImgClicked = (id: number) => {
+    if (selectedImageIds.includes(id)) {
+      toastRef.current?.show({
+        severity: "info",
+        summary: "Success",
+        detail: "Id was removed.",
+      });
+
+      setSelectedImageIds((prev) => prev.filter((prevId) => prevId !== id));
+
+      return;
+    } else {
+      toastRef.current?.show({
+        severity: "info",
+        summary: "Success",
+        detail: "Id was added.",
+      });
+
+      setSelectedImageIds((prev) => [...prev, id]);
+      return;
+    }
+  };
+
+  useEffect(() => {
+    console.log(selectedImageIds);
+  }, [selectedImageIds]);
 
   const imageTemplate = (image: string) => {
     return (
@@ -118,6 +150,7 @@ const RoomImageDialog: React.FC<Props> = ({
         if (visible) setVisible(false);
       }}
     >
+      <CustomToast ref={toastRef} />
       <FileUpload
         ref={fileUploadRef}
         multiple
@@ -138,6 +171,14 @@ const RoomImageDialog: React.FC<Props> = ({
         item={imageTemplate}
         thumbnail={thumbnailTemplate}
       />
+      {imageObjs.map((img) => (
+        <Image
+          src={getImageFromServer(ImageLocation.ROOM, img.imageLocation)}
+          alt={img.imageLocation}
+          key={img.id}
+          onClick={() => handleImgClicked(img.id)}
+        />
+      ))}
 
       <Button
         icon={PrimeIcons.EYE}
