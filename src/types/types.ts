@@ -113,6 +113,10 @@ type ArrowDimension = {
   fill: string;
 };
 
+type RoomImage = {
+  imageLocation: string;
+};
+
 export type {
   ArrowDimension,
   Route,
@@ -129,4 +133,5 @@ export type {
   ForgotPassword,
   FloorParam,
   ArrowType,
+  RoomImage,
 };
