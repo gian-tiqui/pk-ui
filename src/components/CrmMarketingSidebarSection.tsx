@@ -64,7 +64,7 @@ const CrmMarketingSidebarSection: React.FC<Props> = ({
       <ScrollPanel
         ref={scrollPanelRef}
         className={`pb-36 ms-5 ${
-          data?.floors && data?.floors?.length > 6 ? "me-1" : "me-5"
+          data?.count && data?.count > 3 ? "me-1" : "me-5"
         }`}
         style={{ height: "calc(100vh - 250px)" }}
       >

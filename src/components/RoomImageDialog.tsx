@@ -14,6 +14,9 @@ import handleErrors from "../@utils/functions/handleErrors";
 import { Toast } from "primereact/toast";
 import getImageFromServer from "../@utils/functions/getFloorMapImageLocation";
 import { ImageLocation } from "../@utils/enums/enum";
+import { Galleria } from "primereact/galleria";
+import { Button } from "primereact/button";
+import { PrimeIcons } from "primereact/api";
 
 interface Props {
   visible: boolean;
@@ -22,6 +25,25 @@ interface Props {
   handleUpload: (event: FileUploadHandlerEvent) => void;
   fileUploadRef: RefObject<FileUpload>;
 }
+
+const responsiveOptions = [
+  {
+    breakpoint: "1500px",
+    numVisible: 5,
+  },
+  {
+    breakpoint: "1024px",
+    numVisible: 3,
+  },
+  {
+    breakpoint: "768px",
+    numVisible: 2,
+  },
+  {
+    breakpoint: "560px",
+    numVisible: 1,
+  },
+];
 
 const RoomImageDialog: React.FC<Props> = ({
   visible,
@@ -36,6 +58,7 @@ const RoomImageDialog: React.FC<Props> = ({
     isDeleted: false,
   });
   const [imageLocationsStr, setImageLocationStr] = useState<string[]>([]);
+  const galleriaRef = useRef<Galleria>(null);
 
   const toastRef = useRef<Toast>(null);
 
@@ -61,6 +84,20 @@ const RoomImageDialog: React.FC<Props> = ({
 
     fetchPhotos();
   }, [roomId, query]);
+
+  const imageTemplate = (image: string) => {
+    return (
+      <img
+        src={image}
+        alt={image}
+        style={{ width: "100%", display: "block" }}
+      />
+    );
+  };
+
+  const thumbnailTemplate = (image: string) => {
+    return <img src={image} alt={image} style={{ display: "block" }} />;
+  };
 
   return (
     <Dialog
@@ -89,9 +126,23 @@ const RoomImageDialog: React.FC<Props> = ({
         customUpload
         uploadHandler={handleUpload}
       />
-      {imageLocationsStr.map((imageUri, index: number) => (
-        <img src={imageUri} alt={`image-${index}`} key={index} />
-      ))}
+      <Galleria
+        ref={galleriaRef}
+        value={imageLocationsStr}
+        responsiveOptions={responsiveOptions}
+        numVisible={9}
+        style={{ maxWidth: "50%" }}
+        circular
+        fullScreen
+        showItemNavigators
+        item={imageTemplate}
+        thumbnail={thumbnailTemplate}
+      />
+
+      <Button
+        icon={PrimeIcons.EYE}
+        onClick={() => galleriaRef.current?.show()}
+      ></Button>
     </Dialog>
   );
 };
