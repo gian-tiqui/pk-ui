@@ -57,6 +57,12 @@ const getRoomPhotos = async (roomId: number, query: Query) => {
   );
 };
 
+const deleteRoomPhotosByRoomId = async (roomId: number, imageIds: string) => {
+  return apiClient.delete(
+    `${URI.API_URI}/api/v1/room/${roomId}/delete-images?imageIds=${imageIds}`
+  );
+};
+
 const softDeleteRoomById = async (roomId: number) => {
   return apiClient.delete(`${URI.API_URI}/api/v1/room/${roomId}/soft-delete`);
 };
@@ -79,4 +85,5 @@ export {
   removeRoomById,
   uploadRoomPhotos,
   getRoomPhotos,
+  deleteRoomPhotosByRoomId,
 };

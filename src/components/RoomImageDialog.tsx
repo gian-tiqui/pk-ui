@@ -5,20 +5,22 @@ import React, {
   RefObject,
   SetStateAction,
   useEffect,
-  useRef,
   useState,
 } from "react";
-import { getRoomPhotos } from "../@utils/services/roomService";
+import {
+  deleteRoomPhotosByRoomId,
+  getRoomPhotos,
+} from "../@utils/services/roomService";
 import { Query, RoomImage } from "../types/types";
 import handleErrors from "../@utils/functions/handleErrors";
 import { Toast } from "primereact/toast";
 import getImageFromServer from "../@utils/functions/getFloorMapImageLocation";
 import { ImageLocation } from "../@utils/enums/enum";
-import { Galleria } from "primereact/galleria";
-import { Button } from "primereact/button";
-import { PrimeIcons } from "primereact/api";
 import { Image } from "primereact/image";
 import CustomToast from "./CustomToast";
+import { Button } from "primereact/button";
+import { PrimeIcons } from "primereact/api";
+import { confirmDialog } from "primereact/confirmdialog";
 
 interface Props {
   visible: boolean;
@@ -26,26 +28,10 @@ interface Props {
   roomId: number;
   handleUpload: (event: FileUploadHandlerEvent) => void;
   fileUploadRef: RefObject<FileUpload>;
+  toastRef: RefObject<Toast>;
+  signal: boolean;
+  setSignal: Dispatch<SetStateAction<boolean>>;
 }
-
-const responsiveOptions = [
-  {
-    breakpoint: "1500px",
-    numVisible: 5,
-  },
-  {
-    breakpoint: "1024px",
-    numVisible: 3,
-  },
-  {
-    breakpoint: "768px",
-    numVisible: 2,
-  },
-  {
-    breakpoint: "560px",
-    numVisible: 1,
-  },
-];
 
 const RoomImageDialog: React.FC<Props> = ({
   visible,
@@ -53,18 +39,18 @@ const RoomImageDialog: React.FC<Props> = ({
   roomId,
   handleUpload,
   fileUploadRef,
+  toastRef,
+  signal,
+  setSignal,
 }) => {
+  const [deleteMode, setDeleteMode] = useState<boolean>(false);
   const [query] = useState<Query>({
     limit: 10,
     offset: 0,
     isDeleted: false,
   });
-  const [imageLocationsStr, setImageLocationStr] = useState<string[]>([]);
   const [imageObjs, setImageObjs] = useState<RoomImage[]>([]);
-  const galleriaRef = useRef<Galleria>(null);
   const [selectedImageIds, setSelectedImageIds] = useState<number[]>([]);
-
-  const toastRef = useRef<Toast>(null);
 
   useEffect(() => {
     const fetchPhotos = () => {
@@ -80,55 +66,65 @@ const RoomImageDialog: React.FC<Props> = ({
               getImageFromServer(ImageLocation.ROOM, image.imageLocation)
             )
           );
-          console.log(response.data);
           setImageObjs(response.data.images);
-          setImageLocationStr(tempImgLocations);
         })
         .catch((error) => handleErrors(error, toastRef));
     };
 
     fetchPhotos();
-  }, [roomId, query]);
+
+    return () => setSignal(false);
+  }, [roomId, query, signal, toastRef, setSignal]);
+
+  const accept = () => {
+    const imageIds: string = selectedImageIds.join(",");
+
+    if (!imageIds || imageIds === "") {
+      toastRef.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "You have not selected a single image",
+      });
+
+      return;
+    }
+
+    deleteRoomPhotosByRoomId(roomId, imageIds)
+      .then((response) => {
+        if (response.status === 200) {
+          if (signal === false) setSignal(true);
+          setSelectedImageIds([]);
+          setDeleteMode(false);
+
+          toastRef.current?.show({
+            severity: "info",
+            summary: "Success",
+            detail: "Images has been moved to trash",
+          });
+        }
+      })
+      .catch((error) => handleErrors(error, toastRef));
+  };
+
+  const handleDelete = () => {
+    confirmDialog({
+      message: "Do you want to move the images to trash?",
+      header: "Delete Images",
+      icon: PrimeIcons.QUESTION_CIRCLE,
+      defaultFocus: "reject",
+      accept,
+    });
+  };
 
   const handleImgClicked = (id: number) => {
     if (selectedImageIds.includes(id)) {
-      toastRef.current?.show({
-        severity: "info",
-        summary: "Success",
-        detail: "Id was removed.",
-      });
-
       setSelectedImageIds((prev) => prev.filter((prevId) => prevId !== id));
 
       return;
     } else {
-      toastRef.current?.show({
-        severity: "info",
-        summary: "Success",
-        detail: "Id was added.",
-      });
-
       setSelectedImageIds((prev) => [...prev, id]);
       return;
     }
-  };
-
-  useEffect(() => {
-    console.log(selectedImageIds);
-  }, [selectedImageIds]);
-
-  const imageTemplate = (image: string) => {
-    return (
-      <img
-        src={image}
-        alt={image}
-        style={{ width: "100%", display: "block" }}
-      />
-    );
-  };
-
-  const thumbnailTemplate = (image: string) => {
-    return <img src={image} alt={image} style={{ display: "block" }} />;
   };
 
   return (
@@ -151,39 +147,73 @@ const RoomImageDialog: React.FC<Props> = ({
       }}
     >
       <CustomToast ref={toastRef} />
-      <FileUpload
-        ref={fileUploadRef}
-        multiple
-        mode="basic"
-        accept="image/*"
-        customUpload
-        uploadHandler={handleUpload}
-      />
-      <Galleria
-        ref={galleriaRef}
-        value={imageLocationsStr}
-        responsiveOptions={responsiveOptions}
-        numVisible={9}
-        style={{ maxWidth: "50%" }}
-        circular
-        fullScreen
-        showItemNavigators
-        item={imageTemplate}
-        thumbnail={thumbnailTemplate}
-      />
-      {imageObjs.map((img) => (
-        <Image
-          src={getImageFromServer(ImageLocation.ROOM, img.imageLocation)}
-          alt={img.imageLocation}
-          key={img.id}
-          onClick={() => handleImgClicked(img.id)}
+      <div className="flex justify-between w-full">
+        <FileUpload
+          ref={fileUploadRef}
+          multiple
+          mode="basic"
+          accept="image/*"
+          customUpload
+          uploadHandler={handleUpload}
+          className="mb-5"
         />
-      ))}
+        <div className="flex gap-2">
+          {!deleteMode && (
+            <Button
+              icon={`${PrimeIcons.ALIGN_JUSTIFY}`}
+              severity="info"
+              className="w-12 h-12"
+              onClick={() => {
+                if (deleteMode == false) setDeleteMode(true);
+              }}
+            ></Button>
+          )}
+          {deleteMode && (
+            <Button
+              icon={`${PrimeIcons.TRASH}`}
+              severity="danger"
+              className="w-12 h-12"
+              onClick={() => {
+                if (deleteMode == true) {
+                  handleDelete();
+                }
+              }}
+            ></Button>
+          )}
+          {deleteMode && (
+            <Button
+              icon={`${PrimeIcons.TIMES}`}
+              severity="warning"
+              className="w-12 h-12"
+              onClick={() => {
+                if (deleteMode == true) {
+                  setDeleteMode(false);
+                  setSelectedImageIds([]);
+                }
+              }}
+            ></Button>
+          )}
+        </div>
+      </div>
 
-      <Button
-        icon={PrimeIcons.EYE}
-        onClick={() => galleriaRef.current?.show()}
-      ></Button>
+      <div className="grid grid-cols-3 gap-3">
+        {imageObjs.map((img) => (
+          <div
+            className={`w-96 flex items-center justify-center overflow-hidden ${
+              selectedImageIds.includes(img.id) && "opacity-35"
+            }`}
+            key={img.id}
+          >
+            <Image
+              preview
+              src={getImageFromServer(ImageLocation.ROOM, img.imageLocation)}
+              alt={img.imageLocation}
+              onClick={deleteMode ? () => handleImgClicked(img.id) : undefined}
+              className="object-cover w-full h-full"
+            />
+          </div>
+        ))}
+      </div>
     </Dialog>
   );
 };

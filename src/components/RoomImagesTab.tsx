@@ -6,7 +6,6 @@ import { Toast } from "primereact/toast";
 import handleErrors from "../@utils/functions/handleErrors";
 import { PrimeIcons } from "primereact/api";
 import { confirmDialog } from "primereact/confirmdialog";
-import CustomToast from "./CustomToast";
 import RoomImageDialog from "./RoomImageDialog";
 import { Button } from "primereact/button";
 
@@ -17,6 +16,7 @@ interface Props {
 const RoomImagesTab: React.FC<Props> = ({ roomId }) => {
   const [visible, setVisible] = useState<boolean>(false);
   const fileUploadRef = useRef<FileUpload>(null);
+  const [signal, setSignal] = useState<boolean>(false);
   const toastRef = useRef<Toast>(null);
 
   const accept = (formData: FormData) => {
@@ -29,6 +29,7 @@ const RoomImagesTab: React.FC<Props> = ({ roomId }) => {
             detail: "Photos uploaded successfully",
           });
 
+          setSignal(true);
           fileUploadRef.current?.clear();
         }
       })
@@ -60,9 +61,11 @@ const RoomImagesTab: React.FC<Props> = ({ roomId }) => {
           roomId={roomId}
           setVisible={setVisible}
           visible={visible}
+          toastRef={toastRef}
+          signal={signal}
+          setSignal={setSignal}
         />
         <div className="grid w-full h-full place-content-center">
-          <CustomToast ref={toastRef} />
           <Button
             icon={`${PrimeIcons.EYE}`}
             className="w-10 h-10"
