@@ -59,6 +59,7 @@ type Room = {
   createdAt: Date;
   updatedAt: Date;
   floor: Floor;
+  status: string;
   direction?: string;
   directionPattern?: { arrows: ArrowType[] };
 };
