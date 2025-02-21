@@ -1,6 +1,9 @@
+import { Image } from "primereact/image";
 import useSelectedFloorStore from "../@utils/store/selectedFloor";
 import AmenityRoomCard from "./AmenityRoomCard";
 import SelectedRoomDialog from "./SelectedRoomDialog";
+import getImageFromServer from "../@utils/functions/getFloorMapImageLocation";
+import { ImageLocation } from "../@utils/enums/enum";
 
 const AmenityFloorRoomContent = () => {
   const { selectedFloor } = useSelectedFloorStore();
@@ -11,6 +14,12 @@ const AmenityFloorRoomContent = () => {
         selectedFloor ? "flex flex-wrap" : "grid place-content-center"
       }`}
     >
+      <Image
+        src={getImageFromServer(
+          ImageLocation.FLOOR,
+          selectedFloor?.imageLocation
+        )}
+      />
       <SelectedRoomDialog />
       {selectedFloor?.rooms && selectedFloor.rooms.length > 0 ? (
         selectedFloor.rooms
