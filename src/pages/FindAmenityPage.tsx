@@ -29,7 +29,7 @@ const FindAmenityPage = () => {
       <div className="flex flex-col h-full">
         <AmenityFloorRoomContent />
 
-        <div className="flex items-center justify-center h-24">
+        <div className="absolute bottom-0 flex items-center justify-center h-24 -translate-x-1/2 left-1/2">
           <FloorNav floors={completeFloors} />
         </div>
       </div>

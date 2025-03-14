@@ -7,7 +7,7 @@ interface Props {
 
 const FloorNav: React.FC<Props> = ({ floors }) => {
   return (
-    <nav className="flex items-center h-20 px-10 mb-4 rounded-full w-96 bg-slate-900">
+    <nav className="flex items-center h-20 px-10 mb-4 rounded-xl w-96 bg-slate-900/90 hover:bg-slate-900 backdrop-blur">
       {floors && floors.length < 1 && (
         <p className="text-slate-100">No available floors yet</p>
       )}
