@@ -11,7 +11,7 @@ import { Button } from "primereact/button";
 import { PrimeIcons } from "primereact/api";
 import { addDirections, getRoomById } from "../@utils/services/roomService";
 import { useQuery } from "@tanstack/react-query";
-import { ImageLocation } from "../@utils/enums/enum";
+import { ImageLocation, StartingPoint } from "../@utils/enums/enum";
 import { getFloorById } from "../@utils/services/floorService";
 import { useParams } from "react-router-dom";
 import { ArrowDimension, ArrowType, FloorParam } from "../types/types";
@@ -45,18 +45,9 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
   const [currentArrow, setCurrentArrow] = useState<ArrowType | null>(null);
   const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
   const [arrowDimension] = useState<ArrowDimension>(ARROW_DIMENSION);
-
-  // const [delayedArrows, setDelayedArrows] = useState<ArrowType[]>([]);
-
-  // useEffect(() => {
-  //   if (visible === false) return;
-  //   setDelayedArrows([]);
-  //   arrows.forEach((arrow, index) => {
-  //     setTimeout(() => {
-  //       setDelayedArrows((prevArrows) => [...prevArrows, arrow]);
-  //     }, index * 500);
-  //   });
-  // }, [arrows, visible]);
+  const [startingPoint, setStartingPoint] = useState<number>(
+    StartingPoint.FRONT_ELEVATOR
+  );
 
   const { data: floor } = useQuery({
     queryKey: [`floor-${param.floorId}`],
@@ -144,7 +135,7 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
       });
       return;
     }
-    addDirections(roomId, { arrows })
+    addDirections(roomId, { directionPattern: arrows, startingPoint })
       .then((response) => {
         if (response.status === 201) {
           confirmDialog({

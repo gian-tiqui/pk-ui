@@ -45,9 +45,16 @@ const uploadRoomPhotos = (roomId: number, formData: FormData) => {
   );
 };
 
-const addDirections = async (roomId: number, directions: object) => {
+const addDirections = async (
+  roomId: number,
+  {
+    directionPattern,
+    startingPoint,
+  }: { directionPattern: object; startingPoint: number }
+) => {
   return apiClient.post(`${URI.API_URI}/api/v1/room/${roomId}/directions`, {
-    directions,
+    directionPattern: { arrows: directionPattern },
+    startingPoint,
   });
 };
 
