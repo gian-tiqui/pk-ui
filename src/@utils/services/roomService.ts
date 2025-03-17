@@ -26,6 +26,16 @@ const getRoomById = async (roomId: number): Promise<Room | undefined> => {
   }
 };
 
+const getRoomDirectionPatternsById = async (
+  roomId?: number,
+  params?: Query
+) => {
+  return apiClient.get(
+    `${URI.API_URI}/api/v1/room/${roomId}/directionPatterns`,
+    { params }
+  );
+};
+
 const updateRoomById = async (
   roomId: number,
   payload: { name?: string; code?: string; detail?: string; direction?: string }
@@ -93,4 +103,5 @@ export {
   uploadRoomPhotos,
   getRoomPhotos,
   deleteRoomPhotosByRoomId,
+  getRoomDirectionPatternsById,
 };

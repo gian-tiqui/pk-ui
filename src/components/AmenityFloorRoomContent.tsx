@@ -6,6 +6,9 @@ import getImageFromServer from "../@utils/functions/getFloorMapImageLocation";
 import { ImageLocation } from "../@utils/enums/enum";
 import useSelectedRoom from "../@utils/store/selectedRoom";
 import { ArrowDimension, ArrowType } from "../types/types";
+import { useQuery } from "@tanstack/react-query";
+import { getRoomDirectionPatternsById } from "../@utils/services/roomService";
+import useStartingPointStore from "../@utils/store/startingPoint";
 
 const ARROW_DIMENSION: ArrowDimension = {
   pointerLength: 19,
@@ -18,13 +21,23 @@ const ARROW_DIMENSION: ArrowDimension = {
 const AmenityFloorRoomContent = () => {
   const { selectedFloor } = useSelectedFloorStore();
   const { selectedRoom } = useSelectedRoom();
-
   const stageRef = useRef<StageType | null>(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
   const [arrowDimension] = useState<ArrowDimension>(ARROW_DIMENSION);
   const [delayedArrows, setDelayedArrows] = useState<ArrowType[]>([]);
   const timeoutsRef = useRef<number[]>([]);
+  const { startingPoint } = useStartingPointStore();
+
+  const { data: roomDirectionsData } = useQuery({
+    queryKey: [`room-${selectedRoom?.id}-direction-patterns-${startingPoint}`],
+    queryFn: () =>
+      getRoomDirectionPatternsById(selectedRoom?.id, { startingPoint }),
+  });
+
+  useEffect(() => {
+    console.log(roomDirectionsData);
+  }, [roomDirectionsData]);
 
   useEffect(() => {
     if (selectedFloor?.imageLocation) {
@@ -47,16 +60,21 @@ const AmenityFloorRoomContent = () => {
 
     setDelayedArrows([]);
 
-    if (selectedRoom?.directionPattern?.arrows?.length) {
+    if (
+      roomDirectionsData?.data?.directionPatterns?.length > 0 &&
+      roomDirectionsData?.data.directionPatterns[0]?.directionPattern?.arrows
+    ) {
       const newTimeouts: number[] = [];
 
-      selectedRoom.directionPattern.arrows.forEach((arrow, index) => {
-        const timeoutId = window.setTimeout(() => {
-          setDelayedArrows((prevArrows) => [...prevArrows, arrow]);
-        }, index * 500);
+      roomDirectionsData.data.directionPatterns[0].directionPattern.arrows.forEach(
+        (arrow: { points: number[] }, index: number) => {
+          const timeoutId = window.setTimeout(() => {
+            setDelayedArrows((prevArrows) => [...prevArrows, arrow]);
+          }, index * 500);
 
-        newTimeouts.push(timeoutId);
-      });
+          newTimeouts.push(timeoutId);
+        }
+      );
 
       timeoutsRef.current = newTimeouts;
     }
@@ -66,7 +84,7 @@ const AmenityFloorRoomContent = () => {
         window.clearTimeout(timeoutId)
       );
     };
-  }, [selectedRoom]);
+  }, [roomDirectionsData]); // Changed dependency from selectedRoom to roomDirectionsData
 
   const getArrowMidpoint = (points: number[]) => {
     const midX = (points[0] + points[2]) / 2;
