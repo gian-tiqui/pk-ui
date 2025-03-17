@@ -1,13 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Image } from "primereact/image";
 import { Stage, Layer, Arrow, Image as KonvaImage, Text } from "react-konva";
 import { Stage as StageType } from "konva/lib/Stage";
 import useSelectedFloorStore from "../@utils/store/selectedFloor";
-import AmenityRoomCard from "./AmenityRoomCard";
-import SelectedRoomDialog from "./SelectedRoomDialog";
 import getImageFromServer from "../@utils/functions/getFloorMapImageLocation";
 import { ImageLocation } from "../@utils/enums/enum";
-import { PrimeIcons } from "primereact/api";
 import useSelectedRoom from "../@utils/store/selectedRoom";
 import { ArrowDimension, ArrowType } from "../types/types";
 
@@ -27,10 +23,9 @@ const AmenityFloorRoomContent = () => {
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
   const [arrowDimension] = useState<ArrowDimension>(ARROW_DIMENSION);
-  const [_, setArrows] = useState<ArrowType[]>([]);
   const [delayedArrows, setDelayedArrows] = useState<ArrowType[]>([]);
+  const timeoutsRef = useRef<number[]>([]);
 
-  // Load floor image when selectedFloor changes
   useEffect(() => {
     if (selectedFloor?.imageLocation) {
       const imgSrc = getImageFromServer(
@@ -47,23 +42,30 @@ const AmenityFloorRoomContent = () => {
   }, [selectedFloor]);
 
   useEffect(() => {
-    if (selectedRoom?.directionPattern) {
-      console.log(selectedRoom.directionPattern);
-      setArrows(selectedRoom.directionPattern.arrows || []);
+    timeoutsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
+    timeoutsRef.current = [];
 
-      // Reset and animate arrows with delay
-      setDelayedArrows([]);
-      if (selectedRoom.directionPattern.arrows) {
-        selectedRoom.directionPattern.arrows.forEach((arrow, index) => {
-          setTimeout(() => {
-            setDelayedArrows((prevArrows) => [...prevArrows, arrow]);
-          }, index * 500);
-        });
-      }
-    } else {
-      setArrows([]);
-      setDelayedArrows([]);
+    setDelayedArrows([]);
+
+    if (selectedRoom?.directionPattern?.arrows?.length) {
+      const newTimeouts: number[] = [];
+
+      selectedRoom.directionPattern.arrows.forEach((arrow, index) => {
+        const timeoutId = window.setTimeout(() => {
+          setDelayedArrows((prevArrows) => [...prevArrows, arrow]);
+        }, index * 500);
+
+        newTimeouts.push(timeoutId);
+      });
+
+      timeoutsRef.current = newTimeouts;
     }
+
+    return () => {
+      timeoutsRef.current.forEach((timeoutId) =>
+        window.clearTimeout(timeoutId)
+      );
+    };
   }, [selectedRoom]);
 
   const getArrowMidpoint = (points: number[]) => {
@@ -74,7 +76,7 @@ const AmenityFloorRoomContent = () => {
 
   return (
     <div
-      className={`h-full gap-4 p-4 ${
+      className={`h-full p-4 ${
         selectedFloor ? "flex flex-wrap" : "grid place-content-center"
       }`}
     >
@@ -115,17 +117,6 @@ const AmenityFloorRoomContent = () => {
             </Layer>
           </Stage>
         </div>
-      )}
-      {/* <SelectedRoomDialog /> */}
-      {selectedFloor?.rooms && selectedFloor.rooms.length > 0 ? (
-        selectedFloor.rooms
-          .filter((room) => room.directionPattern)
-          .map((room) => <AmenityRoomCard room={room} key={room.id} />)
-      ) : (
-        <p className="flex items-center text-lg font-medium text-blue-400">
-          <i className={`${PrimeIcons.QUESTION_CIRCLE} me-2 text-xl`}></i>Select
-          a floor
-        </p>
       )}
     </div>
   );

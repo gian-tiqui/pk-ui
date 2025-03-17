@@ -20,18 +20,11 @@ const FindAmenityPage = () => {
     if (data) setCompleteFloors(filterCompleteCloor(data?.floors));
   }, [data]);
 
-  useEffect(() => {
-    console.log(completeFloors);
-  }, [completeFloors]);
-
   return (
     <PageTemplate>
-      <div className="flex flex-col h-full">
+      <div className="w-screen h-full">
         <AmenityFloorRoomContent />
-
-        <div className="absolute bottom-0 flex items-center justify-center h-24 -translate-x-1/2 left-1/2">
-          <FloorNav floors={completeFloors} />
-        </div>
+        <FloorNav floors={completeFloors} />
       </div>
     </PageTemplate>
   );
