@@ -9,9 +9,13 @@ import { Stage, Layer, Arrow, Image, Text } from "react-konva";
 import { Stage as StageType } from "konva/lib/Stage";
 import { Button } from "primereact/button";
 import { PrimeIcons } from "primereact/api";
-import { addDirections, getRoomById } from "../@utils/services/roomService";
+import {
+  addDirections,
+  getRoomById,
+  getRoomDirectionPatternsById,
+} from "../@utils/services/roomService";
 import { useQuery } from "@tanstack/react-query";
-import { ImageLocation } from "../@utils/enums/enum";
+import { ImageLocation, StartingPoint } from "../@utils/enums/enum";
 import { getFloorById } from "../@utils/services/floorService";
 import { useParams } from "react-router-dom";
 import { ArrowDimension, ArrowType, FloorParam } from "../types/types";
@@ -45,18 +49,9 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
   const [currentArrow, setCurrentArrow] = useState<ArrowType | null>(null);
   const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
   const [arrowDimension] = useState<ArrowDimension>(ARROW_DIMENSION);
-
-  // const [delayedArrows, setDelayedArrows] = useState<ArrowType[]>([]);
-
-  // useEffect(() => {
-  //   if (visible === false) return;
-  //   setDelayedArrows([]);
-  //   arrows.forEach((arrow, index) => {
-  //     setTimeout(() => {
-  //       setDelayedArrows((prevArrows) => [...prevArrows, arrow]);
-  //     }, index * 500);
-  //   });
-  // }, [arrows, visible]);
+  const [startingPoint, setStartingPoint] = useState<number>(
+    StartingPoint.FRONT_ELEVATOR
+  );
 
   const { data: floor } = useQuery({
     queryKey: [`floor-${param.floorId}`],
@@ -74,6 +69,41 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
     queryFn: () => getRoomById(roomId),
     enabled: roomId !== -1,
   });
+
+  const {
+    data: roomDirectionsData,
+    refetch,
+    error: roomDirectionsError,
+  } = useQuery({
+    queryKey: [`room-${roomId}-direction-patterns-${startingPoint}`],
+    queryFn: () => getRoomDirectionPatternsById(roomId, { startingPoint }),
+  });
+
+  useEffect(() => {
+    if (roomDirectionsError) {
+      console.warn(roomDirectionsError);
+    }
+  }, [roomDirectionsError]);
+
+  useEffect(() => {
+    refetch();
+  }, [startingPoint, refetch]);
+
+  useEffect(() => {
+    if (
+      !roomDirectionsData?.data?.directionPatterns ||
+      roomDirectionsData.data.directionPatterns.length === 0
+    ) {
+      setArrows([]);
+      return;
+    }
+
+    const arrows =
+      roomDirectionsData.data.directionPatterns[0]?.directionPattern?.arrows;
+
+    if (arrows) setArrows(arrows);
+    else setArrows([]);
+  }, [roomDirectionsData]);
 
   useEffect(() => {
     const setDirections = () => {
@@ -144,7 +174,7 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
       });
       return;
     }
-    addDirections(roomId, { arrows })
+    addDirections(roomId, { directionPattern: arrows, startingPoint })
       .then((response) => {
         if (response.status === 201) {
           confirmDialog({
@@ -158,7 +188,21 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
           });
         }
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+        toastRef.current?.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to save directions.",
+        });
+      });
+  };
+
+  const hasDirections = (point: number) => {
+    if (!roomDirectionsData?.data?.directionPatterns) return false;
+    return roomDirectionsData.data.directionPatterns.some(
+      (pattern: { startingPoint: number }) => pattern.startingPoint === point
+    );
   };
 
   const handleSave = () => {
@@ -221,29 +265,93 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
       header={`Directions Editor for ${room?.name}`}
     >
       <CustomToast ref={toastRef} />
-      <div className="flex justify-end w-full gap-2 mb-2 ">
-        <Button
-          onClick={handleSave}
-          icon={PrimeIcons.SAVE}
-          className="w-8 h-8"
-          tooltip="Save"
-          tooltipOptions={{ position: "bottom" }}
-        />
-        <Button
-          onClick={handleUndo}
-          icon={PrimeIcons.UNDO}
-          className="w-8 h-8"
-          tooltip="Undo"
-          tooltipOptions={{ position: "bottom" }}
-        />
-        <Button
-          onClick={handleClear}
-          icon={PrimeIcons.TRASH}
-          severity="danger"
-          className="w-8 h-8"
-          tooltip="Clear"
-          tooltipOptions={{ position: "bottom" }}
-        />
+      <div className="flex justify-between w-full gap-2 mb-2">
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => {
+              setStartingPoint(StartingPoint.FRONT_ELEVATOR);
+            }}
+            className={`h-8 ${
+              startingPoint === StartingPoint.FRONT_ELEVATOR
+                ? "p-button-info"
+                : hasDirections(StartingPoint.FRONT_ELEVATOR)
+                ? ""
+                : "bg-blue-700"
+            }`}
+            tooltipOptions={{ position: "bottom" }}
+          >
+            Front Elevator
+          </Button>
+          <Button
+            onClick={() => {
+              setStartingPoint(StartingPoint.BACK_ELEVATOR);
+            }}
+            className={`h-8 ${
+              startingPoint === StartingPoint.BACK_ELEVATOR
+                ? "p-button-info"
+                : hasDirections(StartingPoint.BACK_ELEVATOR)
+                ? ""
+                : "bg-blue-700"
+            }`}
+            tooltipOptions={{ position: "bottom" }}
+          >
+            Back Elevator
+          </Button>
+          <Button
+            onClick={() => {
+              setStartingPoint(StartingPoint.FRONT_STAIRS);
+            }}
+            className={`h-8 ${
+              startingPoint === StartingPoint.FRONT_STAIRS
+                ? "p-button-info"
+                : hasDirections(StartingPoint.FRONT_STAIRS)
+                ? ""
+                : "bg-blue-700"
+            }`}
+            tooltipOptions={{ position: "bottom" }}
+          >
+            Front Stairs
+          </Button>
+          <Button
+            onClick={() => {
+              setStartingPoint(StartingPoint.BACK_STAIRS);
+            }}
+            className={`h-8 ${
+              startingPoint === StartingPoint.BACK_STAIRS
+                ? "p-button-info"
+                : hasDirections(StartingPoint.BACK_STAIRS)
+                ? ""
+                : "bg-blue-700"
+            }`}
+            tooltipOptions={{ position: "bottom" }}
+          >
+            Back Stairs
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleSave}
+            icon={PrimeIcons.SAVE}
+            className="w-8 h-8"
+            tooltip="Save"
+            tooltipOptions={{ position: "bottom" }}
+          />
+          <Button
+            onClick={handleUndo}
+            icon={PrimeIcons.UNDO}
+            className="w-8 h-8"
+            tooltip="Undo"
+            tooltipOptions={{ position: "bottom" }}
+          />
+          <Button
+            onClick={handleClear}
+            icon={PrimeIcons.TRASH}
+            severity="danger"
+            className="w-8 h-8"
+            tooltip="Clear"
+            tooltipOptions={{ position: "bottom" }}
+          />
+        </div>
       </div>
       {bgImage && (
         <Stage

@@ -32,6 +32,7 @@ type Query = {
   isDeleted?: boolean;
   roomImageDeleted?: boolean;
   isIncomplete?: boolean;
+  startingPoint?: number;
 };
 
 type Floor = {
