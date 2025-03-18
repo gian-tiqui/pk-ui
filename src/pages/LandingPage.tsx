@@ -7,6 +7,7 @@ import useLoggedInStore from "../@utils/store/loggedIn";
 import { useEffect } from "react";
 import useUserDataStore from "../@utils/store/userDataStore";
 import navigateUserByDeptId from "../@utils/functions/userNavigator";
+import { URI } from "../@utils/enums/enum";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -16,6 +17,10 @@ const LandingPage = () => {
   useEffect(() => {
     if (isLoggedIn) navigateUserByDeptId(user, navigate);
   }, [isLoggedIn, navigate, user]);
+
+  useEffect(() => {
+    console.log("API BASE URI: ", URI.API_URI);
+  }, []);
 
   return (
     <PageTemplate>
