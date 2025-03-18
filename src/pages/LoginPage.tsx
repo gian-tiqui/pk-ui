@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import PageTemplate from "../templates/PageTemplate";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Namespace, URI } from "../@utils/enums/enum";
+import { Namespace } from "../@utils/enums/enum";
 import { Toast } from "primereact/toast";
 import handleLoginError from "../@utils/functions/handleErrors";
 import Cookies from "js-cookie";
