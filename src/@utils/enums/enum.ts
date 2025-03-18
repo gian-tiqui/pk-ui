@@ -3,7 +3,7 @@ enum Namespace {
 }
 
 enum URI {
-  API_URI = import.meta.env.VITE_API_URI,
+  API_URI = import.meta.env.VITE_API_URI || "http://localhost:8083",
 }
 
 enum ImageLocation {
