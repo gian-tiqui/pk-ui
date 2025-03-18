@@ -119,7 +119,7 @@ const LoginPage = () => {
   }, [isActive, navigate]);
 
   useEffect(() => {
-    let timeout: number;
+    let timeout: NodeJS.Timeout;
 
     const resetTimer = () => {
       setIsActive(true);
