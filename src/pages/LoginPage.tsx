@@ -43,10 +43,13 @@ const LoginPage = () => {
 
   const handleLogin = async ({ employeeId, password }: FormFields) => {
     try {
-      const response = await axios.post(`${URI.API_URI}/api/v1/auth/login`, {
-        employeeId,
-        password,
-      });
+      const response = await axios.post(
+        `http://10.10.10.30:8083/api/v1/auth/login`,
+        {
+          employeeId,
+          password,
+        }
+      );
 
       if (response.status === 201) {
         const { accessToken, refreshToken } = response.data.tokens;
