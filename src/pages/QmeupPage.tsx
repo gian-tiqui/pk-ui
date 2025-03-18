@@ -5,7 +5,7 @@ import PageTemplate from "../templates/PageTemplate";
 const QmeupPage = () => {
   const [isActive, setIsActive] = useState<boolean>(true);
   const navigate = useNavigate();
-  const timeoutRef = useRef<number | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const startInactivityTimer = useCallback(() => {
