@@ -42,8 +42,6 @@ const LoginPage = () => {
   }, [navigate, user]);
 
   const handleLogin = async ({ employeeId, password }: FormFields) => {
-    console.log(URI.API_URI);
-
     try {
       const response = await axios.post(`${URI.API_URI}/api/v1/auth/login`, {
         employeeId,
