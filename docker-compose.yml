@@ -11,3 +11,5 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    environment:
+      - VITE_API_URI=http://10.10.10.30:8083
