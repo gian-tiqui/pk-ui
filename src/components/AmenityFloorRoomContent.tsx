@@ -33,11 +33,8 @@ const AmenityFloorRoomContent = () => {
     queryKey: [`room-${selectedRoom?.id}-direction-patterns-${startingPoint}`],
     queryFn: () =>
       getRoomDirectionPatternsById(selectedRoom?.id, { startingPoint }),
+    enabled: !!startingPoint && !!selectedRoom,
   });
-
-  useEffect(() => {
-    console.log(roomDirectionsData);
-  }, [roomDirectionsData]);
 
   useEffect(() => {
     if (selectedFloor?.imageLocation) {
@@ -84,7 +81,7 @@ const AmenityFloorRoomContent = () => {
         window.clearTimeout(timeoutId)
       );
     };
-  }, [roomDirectionsData]); // Changed dependency from selectedRoom to roomDirectionsData
+  }, [roomDirectionsData]);
 
   const getArrowMidpoint = (points: number[]) => {
     const midX = (points[0] + points[2]) / 2;

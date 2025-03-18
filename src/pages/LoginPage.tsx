@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import PageTemplate from "../templates/PageTemplate";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Namespace } from "../@utils/enums/enum";
+import { Namespace, URI } from "../@utils/enums/enum";
 import { Toast } from "primereact/toast";
 import handleLoginError from "../@utils/functions/handleErrors";
 import Cookies from "js-cookie";
@@ -43,13 +43,10 @@ const LoginPage = () => {
 
   const handleLogin = async ({ employeeId, password }: FormFields) => {
     try {
-      const response = await axios.post(
-        `http://10.10.10.30:8083/api/v1/auth/login`,
-        {
-          employeeId,
-          password,
-        }
-      );
+      const response = await axios.post(`${URI.API_URI}/api/v1/auth/login`, {
+        employeeId,
+        password,
+      });
 
       if (response.status === 201) {
         const { accessToken, refreshToken } = response.data.tokens;
