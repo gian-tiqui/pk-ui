@@ -28,7 +28,10 @@ const FloorMainCard: React.FC<Props> = ({ floor }) => {
       <div>
         <p className="text-lg font-medium">{floor?.name}</p>
         <div className="flex justify-between w-full">
-          <small>{floor?.rooms.length} Rooms</small>
+          <small>
+            {floor?.rooms.length} Room
+            {floor?.rooms && floor?.rooms.length > 1 ? "s" : ""}
+          </small>
           <small>{String(floor?.createdAt)}</small>
         </div>
       </div>
