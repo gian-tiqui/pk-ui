@@ -6,6 +6,7 @@ import useSelectedRoom from "../@utils/store/selectedRoom";
 import { Button } from "primereact/button";
 import useStartingPointStore from "../@utils/store/startingPoint";
 import { StartingPoint } from "../@utils/enums/enum";
+import { useEffect } from "react";
 
 interface Props {
   floors: Floor[] | undefined;
@@ -15,6 +16,10 @@ const FloorNav: React.FC<Props> = ({ floors }) => {
   const { selectedFloor, setSelectedFloor } = useSelectedFloorStore();
   const { selectedRoom, setSelectedRoom } = useSelectedRoom();
   const { setStartingPoint } = useStartingPointStore();
+
+  useEffect(() => {
+    console.log(floors);
+  }, [floors]);
 
   return (
     <nav className="absolute top-10 left-10">
