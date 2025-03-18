@@ -3,11 +3,11 @@ enum Namespace {
 }
 
 enum URI {
-  API_URI = import.meta.env.VITE_API_URI || "http://localhost:8083",
+  API_URI = import.meta.env.VITE_API_URI || "http://10.10.10.30:8083",
 }
 
 enum ImageLocation {
-  BASE = "http://localhost:8083",
+  BASE = import.meta.env.VITE_API_URI || "http://10.10.10.30:8083",
   UPLOADS = "uploads",
   ROOM = "room_images",
   FLOOR = "floor_images",
