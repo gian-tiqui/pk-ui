@@ -55,6 +55,7 @@ const AmenityInfoDialog: React.FC<Props> = ({ visible, setVisible }) => {
 
   return (
     <Dialog
+      header={selectedRoom?.name}
       className="w-[95%] h-[95%]"
       visible={visible}
       onHide={() => {
@@ -88,7 +89,7 @@ const AmenityInfoDialog: React.FC<Props> = ({ visible, setVisible }) => {
           header="Images"
           pt={{ headerAction: { className: "bg-inherit" } }}
         >
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             {imageObjs.map((img) => (
               <div
                 className={`flex items-center justify-center overflow-hidden`}
@@ -106,10 +107,6 @@ const AmenityInfoDialog: React.FC<Props> = ({ visible, setVisible }) => {
             ))}
           </div>
         </TabPanel>
-        <TabPanel
-          header="Services"
-          pt={{ headerAction: { className: "bg-inherit" } }}
-        ></TabPanel>
       </TabView>
     </Dialog>
   );

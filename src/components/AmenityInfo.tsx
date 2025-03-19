@@ -2,9 +2,14 @@ import { PrimeIcons } from "primereact/api";
 import { Button } from "primereact/button";
 import { useState } from "react";
 import AmenityInfoDialog from "./AmenityInfoDialog";
+import useSelectedRoom from "../@utils/store/selectedRoom";
 
 const AmenityInfo = () => {
   const [isShown, setIsShown] = useState<boolean>(false);
+
+  const { selectedRoom } = useSelectedRoom();
+
+  if (!selectedRoom) return;
 
   return (
     <>
