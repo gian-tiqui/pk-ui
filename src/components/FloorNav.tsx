@@ -19,7 +19,7 @@ const FloorNav: React.FC<Props> = ({ floors }) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
 
   return isCollapsed ? (
-    <nav className="absolute top-10 left-10">
+    <nav className="absolute top-10 left-10 w-96">
       <header className="flex justify-between p-3 rounded-t-lg bg-slate-900/90 backdrop-blur">
         <h4 className="text-lg font-medium">Select your destination here</h4>
         <div className="flex items-center gap-2">
@@ -42,7 +42,7 @@ const FloorNav: React.FC<Props> = ({ floors }) => {
           ></Button>
         </div>
       </header>
-      <div className="flex items-center gap-3 p-3 shadow bg-slate-800/90 backdrop-blur">
+      <div className="grid grid-cols-2 gap-3 p-3 shadow bg-slate-800/90 backdrop-blur">
         {floors && floors.length < 1 && (
           <p className="text-slate-100">No available floors yet</p>
         )}
@@ -65,7 +65,7 @@ const FloorNav: React.FC<Props> = ({ floors }) => {
             options={floors}
             optionLabel="name"
             placeholder="Select a floor"
-            className="w-40"
+            className="w-full"
             value={selectedFloor}
             onChange={(e) => {
               const floor = e.value;
@@ -89,7 +89,7 @@ const FloorNav: React.FC<Props> = ({ floors }) => {
               input: { className: "text-slate-100" },
             }}
             filter
-            className="w-40"
+            className="w-ful"
             options={selectedFloor.rooms}
             optionLabel="name"
             value={selectedRoom}
