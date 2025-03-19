@@ -6,7 +6,7 @@ import useSelectedRoom from "../@utils/store/selectedRoom";
 import { Button } from "primereact/button";
 import useStartingPointStore from "../@utils/store/startingPoint";
 import { StartingPoint } from "../@utils/enums/enum";
-import { useEffect } from "react";
+import { useState } from "react";
 
 interface Props {
   floors: Floor[] | undefined;
@@ -16,24 +16,31 @@ const FloorNav: React.FC<Props> = ({ floors }) => {
   const { selectedFloor, setSelectedFloor } = useSelectedFloorStore();
   const { selectedRoom, setSelectedRoom } = useSelectedRoom();
   const { setStartingPoint } = useStartingPointStore();
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
 
-  useEffect(() => {
-    console.log(floors);
-  }, [floors]);
-
-  return (
+  return isCollapsed ? (
     <nav className="absolute top-10 left-10">
       <header className="flex justify-between p-3 rounded-t-lg bg-slate-900/90 backdrop-blur">
         <h4 className="text-lg font-medium">Select your destination here</h4>
-        <Button
-          onClick={() => {
-            setSelectedFloor(undefined);
-            setSelectedRoom(undefined);
-          }}
-          severity="contrast"
-          className="w-8 h-8"
-          icon={PrimeIcons.REFRESH}
-        ></Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => {
+              setIsCollapsed((prev) => !prev);
+            }}
+            severity="contrast"
+            className="w-8 h-8"
+            icon={"pi pi-expand"}
+          ></Button>
+          <Button
+            onClick={() => {
+              setSelectedFloor(undefined);
+              setSelectedRoom(undefined);
+            }}
+            severity="contrast"
+            className="w-8 h-8"
+            icon={PrimeIcons.REFRESH}
+          ></Button>
+        </div>
       </header>
       <div className="flex items-center gap-3 p-3 shadow bg-slate-800/90 backdrop-blur">
         {floors && floors.length < 1 && (
@@ -144,6 +151,15 @@ const FloorNav: React.FC<Props> = ({ floors }) => {
         </div>
       </footer>
     </nav>
+  ) : (
+    <Button
+      className="absolute w-8 h-8 top-10 left-10"
+      onClick={() => {
+        setIsCollapsed((prev) => !prev);
+      }}
+      severity="contrast"
+      icon={"pi pi-expand"}
+    ></Button>
   );
 };
 

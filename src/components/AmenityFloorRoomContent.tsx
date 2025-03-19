@@ -9,6 +9,7 @@ import { ArrowDimension, ArrowType } from "../types/types";
 import { useQuery } from "@tanstack/react-query";
 import { getRoomDirectionPatternsById } from "../@utils/services/roomService";
 import useStartingPointStore from "../@utils/store/startingPoint";
+import AmenityInfo from "./AmenityInfo";
 
 const ARROW_DIMENSION: ArrowDimension = {
   pointerLength: 19,
@@ -67,7 +68,7 @@ const AmenityFloorRoomContent = () => {
         (arrow: { points: number[] }, index: number) => {
           const timeoutId = window.setTimeout(() => {
             setDelayedArrows((prevArrows) => [...prevArrows, arrow]);
-          }, index * 500);
+          }, index * 100);
 
           newTimeouts.push(timeoutId);
         }
@@ -91,10 +92,11 @@ const AmenityFloorRoomContent = () => {
 
   return (
     <div
-      className={`h-full p-4 ${
+      className={`h-full p-4 relative ${
         selectedFloor ? "flex flex-wrap" : "grid place-content-center"
       }`}
     >
+      <AmenityInfo />
       {selectedFloor && bgImage && (
         <div className="relative">
           <Stage
