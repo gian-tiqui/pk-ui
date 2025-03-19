@@ -67,7 +67,7 @@ const AmenityFloorRoomContent = () => {
         (arrow: { points: number[] }, index: number) => {
           const timeoutId = window.setTimeout(() => {
             setDelayedArrows((prevArrows) => [...prevArrows, arrow]);
-          }, index * 500);
+          }, index * 100);
 
           newTimeouts.push(timeoutId);
         }
