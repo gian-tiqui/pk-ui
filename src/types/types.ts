@@ -120,7 +120,13 @@ type RoomImage = {
   imageLocation: string;
 };
 
+type Item = {
+  code: string;
+  description: string;
+};
+
 export type {
+  Item,
   ArrowDimension,
   Route,
   UserData,

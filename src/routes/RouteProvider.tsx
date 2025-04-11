@@ -17,6 +17,7 @@ import { Dialog } from "primereact/dialog";
 import { Toast } from "primereact/toast";
 import CustomToast from "../components/CustomToast";
 import { PrimeIcons } from "primereact/api";
+import OrderPage from "../pages/OrderPage";
 
 const RouteProvider = () => {
   const [visible, setVisible] = useState<boolean>(false);
@@ -82,6 +83,12 @@ const RouteProvider = () => {
       hidden: true,
       path: "user-management",
       element: <UserManagement />,
+    },
+    {
+      name: "Ordering Page",
+      hidden: true,
+      path: "order",
+      element: <OrderPage />,
     },
   ];
 

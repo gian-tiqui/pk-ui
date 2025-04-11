@@ -24,12 +24,14 @@ const MainPage = () => {
                 <p className="text-lg font-medium text-slate-100">Open QMEUP</p>
               </Card>
             </Link>
-            {/* <Card
-              className="border cursor-pointer w-44 h-44 bg-slate-900/40 border-slate-700 backdrop-blur-sm hover:shadow hover:shadow-blue-400"
-              onClick={openAndCloseTab}
-            >
-              <p className="text-lg font-medium text-slate-100">Open QMEUP</p>
-            </Card> */}
+
+            <Link to={"/order"}>
+              <Card className="border w-44 h-44 bg-slate-900/40 border-slate-700 backdrop-blur-sm hover:shadow hover:shadow-blue-400">
+                <p className="text-lg font-medium text-slate-100">
+                  Order medicines or services
+                </p>
+              </Card>
+            </Link>
           </div>
         </div>
       </div>
