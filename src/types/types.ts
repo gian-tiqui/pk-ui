@@ -125,7 +125,14 @@ type Item = {
   description: string;
 };
 
+type Doctor = {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+};
+
 export type {
+  Doctor,
   Item,
   ArrowDimension,
   Route,
