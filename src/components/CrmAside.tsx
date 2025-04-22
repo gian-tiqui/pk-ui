@@ -19,6 +19,7 @@ const CrmAside = () => {
       <CrmSidebarSection setVisible={setVisible} />
       <hr className="mx-5 mb-3 border-b border-slate-700" />
       <CrmSidebarFooter />
+      <div className="bg-blue-500"></div>
     </aside>
   );
 };
