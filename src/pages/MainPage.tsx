@@ -60,8 +60,11 @@ const MainPage = () => {
               className="w-64 h-10 rounded-full"
             />
           </IconField>
-          <div className="flex flex-col items-end justify-between w-full h-full gap-3 pt-10">
-            <div className="h-[30%] border w-80 bg-blue-600 shadow rounded-2xl flex flex-col justify-between p-4">
+          <div className="flex flex-col items-end justify-between w-full h-full gap-3 pt-10 cursor-pointer">
+            <div
+              onClick={() => navigate("/qmeup")}
+              className="h-[30%] w-80 bg-blue-600 shadow rounded-2xl flex flex-col justify-between p-4"
+            >
               <i className={`${PrimeIcons.TICKET} text-3xl`}></i>
 
               <p className="w-64 text-xl font-semibold text-white">
@@ -69,7 +72,7 @@ const MainPage = () => {
                 Click me
               </p>
             </div>
-            <div className="h-[30%] border w-80 bg-white shadow rounded-2xl flex flex-col justify-between p-4">
+            <div className="h-[30%] w-80 bg-white shadow rounded-2xl flex flex-col justify-between p-4">
               <i className={`${PrimeIcons.MAP_MARKER} text-3xl`}></i>
 
               <p className="w-64 text-xl font-semibold text-black">
@@ -77,7 +80,10 @@ const MainPage = () => {
                 using our <span className="text-blue-700">directory</span>
               </p>
             </div>
-            <div className="h-[30%] border w-80 bg-white shadow rounded-2xl flex flex-col justify-between p-4">
+            <div
+              onClick={() => navigate("/scheduler")}
+              className="h-[30%] w-80 bg-white shadow rounded-2xl flex flex-col justify-between p-4"
+            >
               <i className={`${PrimeIcons.CALENDAR} text-3xl`}></i>
               <p className="w-64 text-xl font-semibold text-black">
                 <span className="text-blue-700">Schedule</span> an appointment
