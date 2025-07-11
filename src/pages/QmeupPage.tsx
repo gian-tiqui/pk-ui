@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageTemplate from "../templates/PageTemplate";
-import MainMenuButton from "../components/MainMenuButton";
 
 const QmeupPage = () => {
   const navigate = useNavigate();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [timeLeft, setTimeLeft] = useState(50);
+  const [, setTimeLeft] = useState(50);
 
   useEffect(() => {
     const timer = setInterval(() => {
