@@ -1,13 +1,6 @@
 import PageTemplate from "../templates/PageTemplate";
-import mountGraceLogo from "../assets/MGHI-StandAlone-Colored 1.png";
-import wmcLogo from "../assets/westlake_logo_horizontal.jpg 1.png";
-import customWmcFacade from "../assets/Group 1 (1).png";
-import { Image } from "primereact/image";
 import { Button } from "primereact/button";
 import { PrimeIcons } from "primereact/api";
-import { InputText } from "primereact/inputtext";
-import { IconField } from "primereact/iconfield";
-import { InputIcon } from "primereact/inputicon";
 import { useNavigate } from "react-router-dom";
 
 const MainPage = () => {
@@ -16,81 +9,120 @@ const MainPage = () => {
 
   return (
     <PageTemplate>
-      <main className="grid w-full h-full grid-cols-4 p-7">
-        <div className="flex flex-col justify-between h-full">
-          <h3 className="text-2xl font-semibold">Westlake Medical Center</h3>
-          <div>
-            <h3 className="mb-2 text-4xl text-blue-700">
-              Need diagnostic exams?
-            </h3>
-            <p className="text-xl">
-              We offer the following{" "}
-              <span className="text-blue-700">services:</span>
-            </p>
-            <ul className="mb-3 text-lg font-medium list-disc ms-10">
-              {services.map((service: string, index: number) => (
-                <li key={index}>{service}</li>
-              ))}
-            </ul>
-            <Button
-              onClick={() => navigate("/order")}
-              icon={`${PrimeIcons.SHOPPING_CART} text-2xl`}
-              className="justify-center gap-2 text-xl font-medium text-black bg-white border-none rounded-full shadow h-11 w-44"
-            >
-              Click here
-            </Button>
-          </div>
-          <Image src={mountGraceLogo} height="190" width="190" />
+      <main className="flex flex-col h-screen p-4 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        {/* Header */}
+        <div className="mb-6 text-center">
+          <h1 className="mb-2 text-4xl font-bold text-gray-800">
+            Westlake Medical Center
+          </h1>
+          <div className="w-24 h-1 mx-auto rounded-full bg-gradient-to-r from-blue-500 to-indigo-600"></div>
         </div>
-        <div className="relative flex justify-center h-full col-span-2">
-          <Image
-            src={wmcLogo}
-            className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
-            height="120"
-            width="120"
-          />
 
-          <Image src={customWmcFacade} className="w-[82%] h-96" />
-        </div>
-        <div className="flex flex-col items-end w-full h-full">
-          <IconField iconPosition="left">
-            <InputIcon className="pi pi-search"> </InputIcon>
-            <InputText
-              placeholder="Search..."
-              className="w-64 h-10 rounded-full"
-            />
-          </IconField>
-          <div className="flex flex-col items-end justify-between w-full h-full gap-3 pt-10 cursor-pointer">
+        {/* Main Content - Fixed Height Grid */}
+        <div className="grid flex-1 w-full grid-cols-3 gap-6 mx-auto max-w-7xl">
+          {/* Services Section */}
+          <div className="flex flex-col col-span-2">
+            <div className="flex flex-col flex-1 p-6 border shadow-xl bg-white/70 backdrop-blur-sm rounded-3xl border-white/20">
+              <h2 className="mb-3 text-2xl font-bold text-gray-800">
+                <span className="text-blue-600">Diagnostic</span> Services
+              </h2>
+              <p className="mb-4 text-lg text-gray-600">
+                We offer comprehensive medical services for your health needs
+              </p>
+
+              <div className="grid flex-1 grid-cols-2 gap-3 mb-6">
+                {services.map((service, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-center p-4 text-lg font-semibold text-center text-white transition-all duration-300 transform shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl hover:scale-105"
+                  >
+                    {service}
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                onClick={() => navigate("/order")}
+                icon={`${PrimeIcons.SHOPPING_CART}`}
+                className="justify-center w-full gap-3 text-xl font-semibold text-white transition-all duration-300 transform border-none shadow-lg bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl h-14 hover:from-emerald-600 hover:to-teal-700 hover:scale-105"
+              >
+                Order Services
+              </Button>
+            </div>
+          </div>
+
+          {/* Action Cards */}
+          <div className="flex flex-col gap-4">
             <div
               onClick={() => navigate("/qmeup")}
-              className="h-[30%] w-80 bg-blue-600 shadow rounded-2xl flex flex-col justify-between p-4"
+              className="flex flex-col justify-between flex-1 p-6 text-white transition-all duration-300 transform shadow-xl cursor-pointer bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl hover:scale-105 hover:shadow-2xl"
             >
-              <i className={`${PrimeIcons.TICKET} text-3xl`}></i>
-
-              <p className="w-64 text-xl font-semibold text-white">
-                Need a <span className="text-black">Queueing number?</span>{" "}
-                Click me
-              </p>
+              <div className="flex items-center justify-between mb-4">
+                <i className={`${PrimeIcons.TICKET} text-3xl`}></i>
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20">
+                  <i className={`${PrimeIcons.ARROW_RIGHT} text-lg`}></i>
+                </div>
+              </div>
+              <div>
+                <h3 className="mb-2 text-xl font-bold">Queue Number</h3>
+                <p className="text-base text-blue-100">
+                  Get your waiting number instantly
+                </p>
+              </div>
             </div>
-            <div className="h-[30%] w-80 bg-white shadow rounded-2xl flex flex-col justify-between p-4">
-              <i className={`${PrimeIcons.MAP_MARKER} text-3xl`}></i>
 
-              <p className="w-64 text-xl font-semibold text-black">
-                <span className="text-blue-700">Explore</span> our hospital
-                using our <span className="text-blue-700">directory</span>
-              </p>
+            <div className="flex flex-col justify-between flex-1 p-6 transition-all duration-300 transform border shadow-xl cursor-pointer bg-white/70 backdrop-blur-sm rounded-3xl border-white/20 hover:scale-105 hover:shadow-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <i
+                  className={`${PrimeIcons.MAP_MARKER} text-3xl text-blue-600`}
+                ></i>
+                <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+                  <i
+                    className={`${PrimeIcons.ARROW_RIGHT} text-lg text-blue-600`}
+                  ></i>
+                </div>
+              </div>
+              <div>
+                <h3 className="mb-2 text-xl font-bold text-gray-800">
+                  Directory
+                </h3>
+                <p className="text-base text-gray-600">
+                  Navigate our hospital easily
+                </p>
+              </div>
             </div>
+
             <div
               onClick={() => navigate("/scheduler")}
-              className="h-[30%] w-80 bg-white shadow rounded-2xl flex flex-col justify-between p-4"
+              className="flex flex-col justify-between flex-1 p-6 transition-all duration-300 transform border shadow-xl cursor-pointer bg-white/70 backdrop-blur-sm rounded-3xl border-white/20 hover:scale-105 hover:shadow-2xl"
             >
-              <i className={`${PrimeIcons.CALENDAR} text-3xl`}></i>
-              <p className="w-64 text-xl font-semibold text-black">
-                <span className="text-blue-700">Schedule</span> an appointment
-                from our <span className="text-blue-700">Doctors</span>
-              </p>
+              <div className="flex items-center justify-between mb-4">
+                <i
+                  className={`${PrimeIcons.CALENDAR} text-3xl text-blue-600`}
+                ></i>
+                <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+                  <i
+                    className={`${PrimeIcons.ARROW_RIGHT} text-lg text-blue-600`}
+                  ></i>
+                </div>
+              </div>
+              <div>
+                <h3 className="mb-2 text-xl font-bold text-gray-800">
+                  Appointments
+                </h3>
+                <p className="text-base text-gray-600">
+                  Schedule with our doctors
+                </p>
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-4 text-center">
+          <p className="text-base text-gray-500">
+            Your health is our priority • Touch any option to get started
+          </p>
         </div>
       </main>
     </PageTemplate>
