@@ -48,18 +48,7 @@ const QmeupPage = () => {
 
   return (
     <PageTemplate>
-      <div className="relative w-full h-screen">
-        <div className="absolute z-50 p-2 text-white bg-black rounded top-4 left-4 bg-opacity-70">
-          Returning in: {timeLeft}s
-        </div>
-        <MainMenuButton />
-        <iframe
-          className="w-full h-full"
-          src="https://qmeup.westlakemed.com.ph:9096/kiosk/spQ5EvTbHXNgi74wv/Y43tBt8u9tfjfmNuW/services"
-          title="QMEUP"
-          sandbox="allow-scripts allow-same-origin"
-        />
-      </div>
+      <div className="relative w-full h-screen">test</div>
     </PageTemplate>
   );
 };

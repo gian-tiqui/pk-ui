@@ -2,7 +2,6 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import CrmSidebar from "../components/CrmSidebar";
 import NotFoundPage from "../pages/NotFoundPage";
-import LandingPage from "../pages/LandingPage";
 import MainPage from "../pages/MainPage";
 import FindAmenityPage from "../pages/FindAmenityPage";
 import LoginPage from "../pages/LoginPage";
@@ -24,13 +23,8 @@ const AppRoutes = () => {
       path: "*",
       element: <NotFoundPage />,
     },
-    {
-      name: "Landing Page",
-      hidden: false,
-      path: "/",
-      element: <LandingPage />,
-    },
-    { name: "Main Page", hidden: false, path: "/main", element: <MainPage /> },
+
+    { name: "Main Page", hidden: false, path: "/", element: <MainPage /> },
     {
       name: "Find Amenity Page",
       hidden: false,
