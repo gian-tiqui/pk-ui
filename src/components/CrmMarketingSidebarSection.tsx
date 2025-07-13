@@ -33,60 +33,99 @@ const CrmMarketingSidebarSection: React.FC<Props> = ({
   setSelectedId,
 }) => {
   return (
-    <section className="flex-1 overflow-hidden">
-      <div className="py-2 mx-5">
+    <section className="flex-1 p-6 overflow-auto h-96 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Home Button */}
+      <div className="mb-6">
         <Button
           onClick={() => navigate("/amenity-management")}
-          className="w-full h-10 px-3"
-          icon={`${PrimeIcons.HOME} mr-3 text-lg`}
+          className="w-full py-3 text-gray-800 transition-all duration-300 transform border-none shadow-lg bg-white/70 backdrop-blur-sm rounded-2xl hover:bg-white/80 hover:scale-105 border-white/20"
+          icon={`${PrimeIcons.HOME} mr-3 text-lg text-blue-600`}
         >
-          Home
+          <span className="font-semibold">Home</span>
         </Button>
       </div>
-      <IconField iconPosition="left" className="mx-5 mt-2 mb-5">
-        <InputIcon className="pi pi-search"> </InputIcon>
-        <InputText
-          placeholder="Search"
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="h-10 border-slate-700 bg-slate-800 text-slate-100"
-        />
-      </IconField>
-      <div className="flex items-center justify-between h-10 mx-5">
-        <small className="text-sm">Floors</small>
+
+      {/* Search Field */}
+      <div className="mb-6">
+        <IconField iconPosition="left">
+          <InputIcon className="text-gray-400 pi pi-search"></InputIcon>
+          <InputText
+            placeholder="Search floors..."
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full h-12 px-4 text-gray-700 transition-all duration-300 border shadow-lg bg-white/70 backdrop-blur-sm rounded-2xl border-white/20 focus:border-blue-400 focus:bg-white/80 hover:bg-white/80"
+          />
+        </IconField>
+      </div>
+
+      {/* Section Header */}
+      <div className="flex items-center justify-between p-4 mb-4 border shadow-lg bg-white/70 backdrop-blur-sm rounded-2xl border-white/20">
+        <h3 className="text-lg font-bold text-gray-800">Floors</h3>
         <div
           onClick={() => setVisible(true)}
-          className="flex items-center gap-2 hover:cursor-pointer hover:border-b"
+          className="flex items-center gap-2 px-3 py-2 text-white transition-all duration-300 transform shadow-lg cursor-pointer bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl hover:from-blue-600 hover:to-indigo-700 hover:scale-105"
         >
-          <i className={`${PrimeIcons.PLUS} text-xs`}></i>
-          <p className="text-sm">Add Floor</p>
+          <i className={`${PrimeIcons.PLUS} text-sm`}></i>
+          <span className="text-sm font-medium">Add Floor</span>
         </div>
       </div>
-      <ScrollPanel
-        ref={scrollPanelRef}
-        className={`pb-36 ms-5 ${
-          data?.count && data?.count > 3 ? "me-1" : "me-5"
-        }`}
-        style={{ height: "calc(100vh - 250px)" }}
-      >
-        {isLoading && <small className="text-slate-100">Loading floors</small>}
-        {isError && (
-          <small className="text-slate-100">
-            There was a problem in loading the floors
-          </small>
-        )}
-        {data?.floors && data?.floors.length === 0 ? (
-          <small className="text-slate-100">No floors yet</small>
-        ) : (
-          data?.floors?.map((floor) => (
-            <FloorItem
-              key={floor.id}
-              {...floor}
-              selectedId={selectedId}
-              setSelectedId={setSelectedId}
-            />
-          ))
-        )}
-      </ScrollPanel>
+
+      {/* Scrollable Content */}
+      <div className="p-4 border shadow-xl bg-white/70 backdrop-blur-sm rounded-3xl border-white/20">
+        <ScrollPanel
+          ref={scrollPanelRef}
+          className="pb-4"
+          style={{ height: "calc(100vh - 350px)" }}
+        >
+          {/* Loading State */}
+          {isLoading && (
+            <div className="flex items-center justify-center py-8">
+              <div className="flex items-center gap-3 px-4 py-3 text-blue-600 border shadow-lg bg-white/70 backdrop-blur-sm rounded-2xl border-white/20">
+                <div className="w-5 h-5 border-2 border-blue-600 rounded-full animate-spin border-t-transparent"></div>
+                <span className="text-sm font-medium">Loading floors...</span>
+              </div>
+            </div>
+          )}
+
+          {/* Error State */}
+          {isError && (
+            <div className="p-4 text-red-600 border shadow-lg bg-red-50/70 backdrop-blur-sm rounded-2xl border-red-200/20">
+              <div className="flex items-center gap-2">
+                <i className={`${PrimeIcons.EXCLAMATION_CIRCLE} text-lg`}></i>
+                <span className="text-sm font-medium">
+                  Problem loading floors. Please try again.
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {data?.floors && data?.floors.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-gradient-to-r from-gray-400 to-gray-500">
+                <i className={`${PrimeIcons.BUILDING} text-2xl text-white`}></i>
+              </div>
+              <p className="font-medium text-gray-600">No floors yet</p>
+              <p className="mt-1 text-sm text-gray-500">
+                Add your first floor to get started
+              </p>
+            </div>
+          )}
+
+          {/* Floor Items */}
+          {data?.floors && data?.floors.length > 0 && (
+            <div className="space-y-3">
+              {data.floors.map((floor) => (
+                <FloorItem
+                  key={floor.id}
+                  {...floor}
+                  selectedId={selectedId}
+                  setSelectedId={setSelectedId}
+                />
+              ))}
+            </div>
+          )}
+        </ScrollPanel>
+      </div>
     </section>
   );
 };

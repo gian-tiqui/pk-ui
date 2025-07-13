@@ -57,11 +57,11 @@ const AmenityManagementPage = () => {
         pt={{
           header: {
             className:
-              "bg-slate-900 text-slate-100 border-t border-x border-slate-700",
+              "bg-white/10 backdrop-blur-sm text-gray-800 border-t border-x border-white/20 rounded-t-2xl",
           },
           content: {
             className:
-              "bg-slate-900 text-slate-100 pt-5 border-x border-slate-700",
+              "bg-white/10 backdrop-blur-sm text-gray-800 pt-5 border-x border-white/20 rounded-b-2xl",
           },
         }}
         visible={visible}
@@ -69,11 +69,11 @@ const AmenityManagementPage = () => {
         header="Session expired"
         className="w-96"
       >
-        <p className="text-center">
+        <p className="font-medium text-center">
           Your session has expired. Going back to the main page in {counter}...
         </p>
       </Dialog>
-      <main className="p-10 overflow-y-auto font-medium">
+      <main className="max-h-screen p-6 overflow-auto font-medium bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <AmenityManagementPageHeader user={user} />
         <AmenityManagementPageSection />
       </main>

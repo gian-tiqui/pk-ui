@@ -1,5 +1,4 @@
 import { PrimeIcons } from "primereact/api";
-import { Button } from "primereact/button";
 import { Namespace, URI } from "../@utils/enums/enum";
 import Cookies from "js-cookie";
 import useUserDataStore from "../@utils/store/userDataStore";
@@ -15,6 +14,7 @@ import handleErrors from "../@utils/functions/handleErrors";
 import { Dialog } from "primereact/dialog";
 import useHasSecretStore from "../@utils/store/userHasSecret";
 import CustomToast from "./CustomToast";
+import { Settings, LogOut, Shield, AlertTriangle } from "lucide-react";
 
 const CrmSidebarFooter = () => {
   const navigate = useNavigate();
@@ -84,15 +84,17 @@ const CrmSidebarFooter = () => {
   return (
     <>
       <CustomToast ref={toastRef} />
+
+      {/* Recovery Method Dialog */}
       <Dialog
         pt={{
           header: {
             className:
-              "bg-slate-900 text-slate-100 border-x border-t border-slate-700",
+              "bg-white/10 backdrop-blur-sm text-gray-800 border-t border-x border-white/20 rounded-t-2xl",
           },
           content: {
             className:
-              "bg-slate-900 text-slate-100 border-x border-b border-slate-700",
+              "bg-white/10 backdrop-blur-sm text-gray-800 border-x border-b border-white/20 rounded-b-2xl",
           },
         }}
         visible={noSecretDialogVisible}
@@ -108,62 +110,76 @@ const CrmSidebarFooter = () => {
           if (noSecretDialogVisible === true) setNoSecretDialogVisible(false);
         }}
         className="w-96"
-        header="Recovery Method Not Set"
+        header={
+          <div className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-amber-500" />
+            <span>Recovery Method Not Set</span>
+          </div>
+        }
       >
-        <p className="mb-5">
-          Looks like you have not set your secret question and answer for your
-          account recovery.
-        </p>
+        <div className="p-4">
+          <div className="flex items-start gap-3 mb-4">
+            <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />
+            <p className="text-sm">
+              Looks like you have not set your secret question and answer for
+              your account recovery.
+            </p>
+          </div>
 
-        <div className="flex justify-end w-full">
-          <Button
-            className="h-10"
-            onClick={() => {
-              setNoSecretDialogVisible(false);
-              setSettingsDialogVisible(true);
-            }}
-          >
-            Set secrets
-          </Button>
+          <div className="flex justify-end">
+            <button
+              onClick={() => {
+                setNoSecretDialogVisible(false);
+                setSettingsDialogVisible(true);
+              }}
+              className="px-4 py-2 text-white transition-all duration-300 shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl hover:from-blue-600 hover:to-indigo-700"
+            >
+              Set secrets
+            </button>
+          </div>
         </div>
       </Dialog>
-      <footer className="flex flex-col gap-2 mx-5">
+
+      {/* Footer Buttons */}
+      <div className="space-y-2">
         <ConfirmDialog
           pt={{
             header: {
               className:
-                "bg-slate-900 text-slate-100 border-x border-t border-slate-700",
+                "bg-white/10 backdrop-blur-sm text-gray-800 border-t border-x border-white/20 rounded-t-2xl",
             },
             content: {
               className:
-                "bg-slate-900 text-slate-100 border-x border-slate-700",
+                "bg-white/10 backdrop-blur-sm text-gray-800 border-x border-white/20",
             },
             footer: {
-              className: "bg-slate-900 border-x border-b border-slate-700",
+              className:
+                "bg-white/10 backdrop-blur-sm border-x border-b border-white/20 rounded-b-2xl",
             },
           }}
         />
+
         <SettingsDialog
           visible={settingsDialogVisible}
           setVisible={setSettingsDialogVisible}
         />
-        <Button
-          className="w-full h-12 text-sm border-none bg-inherit hover:bg-gray-800"
-          severity="contrast"
-          icon={`${PrimeIcons.COG} text-sm me-2`}
+
+        <button
           onClick={() => setSettingsDialogVisible(true)}
+          className="flex items-center w-full gap-3 px-4 py-3 text-gray-700 transition-all duration-300 hover:bg-white/20 rounded-xl hover:shadow-md"
         >
-          Account Settings
-        </Button>
-        <Button
+          <Settings className="w-4 h-4" />
+          <span className="text-sm font-medium">Account Settings</span>
+        </button>
+
+        <button
           onClick={handleLogoutClicked}
-          className="w-full h-12 text-sm border-none bg-inherit hover:bg-gray-800"
-          severity="contrast"
-          icon={`${PrimeIcons.SIGN_OUT} text-sm me-2`}
+          className="flex items-center w-full gap-3 px-4 py-3 text-red-600 transition-all duration-300 hover:bg-red-50/50 rounded-xl hover:shadow-md"
         >
-          Logout
-        </Button>
-      </footer>
+          <LogOut className="w-4 h-4" />
+          <span className="text-sm font-medium">Logout</span>
+        </button>
+      </div>
     </>
   );
 };

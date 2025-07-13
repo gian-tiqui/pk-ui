@@ -17,14 +17,14 @@ const CrmSidebar: React.FC<Props> = ({ children }) => {
 
   return (
     <PageTemplate>
-      <div className="flex bg-inherit">
+      <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         {isExpanded === false && (
-          <div className="absolute z-10 top-4 left-4">
+          <div className="absolute z-10 top-6 left-6">
             <CrmAsideButtonToggler />
           </div>
         )}
         {isExpanded && <CrmAside />}
-        <main className="w-full">{children}</main>
+        <main className="flex-1 transition-all duration-300">{children}</main>
       </div>
     </PageTemplate>
   );
