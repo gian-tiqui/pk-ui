@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Floor, Query, Room } from "../../types/types";
 import { URI } from "../enums/enum";
 import apiClient from "../http-common/apiClient";
@@ -16,7 +17,7 @@ const getFloors = async (
   query: Query
 ): Promise<{ floors: Floor[]; count: number } | undefined> => {
   try {
-    const response = await apiClient.get(
+    const response = await axios.get(
       `${URI.API_URI}/api/v1/floor?search=${query.search}&limit=${
         query.limit || 10
       }`

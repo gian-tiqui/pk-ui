@@ -91,33 +91,52 @@ const CrmSidebarSection: React.FC<Props> = ({ setVisible }) => {
     refetch();
   }, [query, refetch]);
 
-  switch (user?.deptId) {
-    case Department.IT: {
-      return <ITSidebarSection />;
-      break;
-    }
-    case Department.MRKT: {
-      return (
-        <CrmMarketingSidebarSection
-          data={data}
-          isError={isError}
-          isLoading={isLoading}
-          navigate={navigate}
-          scrollPanelRef={scrollPanelRef}
-          selectedId={selectedId}
-          setSearchTerm={setSearchTerm}
-          setSelectedId={setSelectedId}
-          setVisible={setVisible}
-        />
-      );
-    }
-    case Department.SSD: {
-      break;
-    }
-    default: {
-      break;
-    }
-  }
+  const sectionProps = {
+    data,
+    isError,
+    isLoading,
+    navigate,
+    scrollPanelRef,
+    selectedId,
+    setSearchTerm,
+    setSelectedId,
+    setVisible,
+  };
+
+  return (
+    <div className="h-full p-4">
+      {(() => {
+        switch (user?.deptId) {
+          case Department.IT:
+            return <ITSidebarSection />;
+          case Department.MRKT:
+            return <CrmMarketingSidebarSection {...sectionProps} />;
+          case Department.SSD:
+            return (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600">
+                    <span className="text-lg font-bold text-white">SSD</span>
+                  </div>
+                  <p className="text-sm text-gray-600">SSD Department</p>
+                </div>
+              </div>
+            );
+          default:
+            return (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-gray-400 to-gray-600">
+                    <span className="text-lg font-bold text-white">?</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Unknown Department</p>
+                </div>
+              </div>
+            );
+        }
+      })()}
+    </div>
+  );
 };
 
 export default CrmSidebarSection;

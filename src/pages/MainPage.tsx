@@ -71,7 +71,10 @@ const MainPage = () => {
               </div>
             </div>
 
-            <div className="flex flex-col justify-between flex-1 p-6 transition-all duration-300 transform border shadow-xl cursor-pointer bg-white/70 backdrop-blur-sm rounded-3xl border-white/20 hover:scale-105 hover:shadow-2xl">
+            <div
+              onClick={() => navigate("find-amenity")}
+              className="flex flex-col justify-between flex-1 p-6 transition-all duration-300 transform border shadow-xl cursor-pointer bg-white/70 backdrop-blur-sm rounded-3xl border-white/20 hover:scale-105 hover:shadow-2xl"
+            >
               <div className="flex items-center justify-between mb-4">
                 <i
                   className={`${PrimeIcons.MAP_MARKER} text-3xl text-blue-600`}

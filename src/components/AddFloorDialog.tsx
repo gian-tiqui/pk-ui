@@ -90,111 +90,145 @@ const AddFloorDialog: React.FC<Props> = ({ visible, onHide, setVisible }) => {
     <>
       <CustomToast ref={toastRef} />
       <Dialog
-        header="Add a floor"
+        header={
+          <div className="flex items-center gap-3 p-6 text-white bg-gradient-to-r from-blue-500 to-indigo-600">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm">
+              <i className={`${PrimeIcons.BUILDING} text-lg`}></i>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">Add New Floor</h2>
+              <p className="text-sm text-blue-100">Create a new floor entry</p>
+            </div>
+          </div>
+        }
         visible={visible}
         onHide={() => {
           onHide();
           reset();
         }}
-        className="p-4 w-96"
+        className="w-[480px]"
         pt={{
+          root: {
+            className: "rounded-3xl overflow-hidden shadow-2xl border-none",
+          },
           header: {
             className:
-              "bg-slate-900 text-slate-100 border-t border-x border-slate-700",
+              "border-none p-0 bg-gradient-to-r from-blue-500 to-indigo-600",
           },
           content: {
             className:
-              "bg-slate-900 text-slate-100 pt-5 border-x border-slate-700",
+              "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6 border-none",
           },
         }}
       >
-        <form onSubmit={handleSubmit(handleAddFloorClicked)}>
-          <div className="h-24">
+        <form
+          onSubmit={handleSubmit(handleAddFloorClicked)}
+          className="space-y-6"
+        >
+          {/* Floor Level Field */}
+          <div className="p-5 border shadow-lg bg-white/70 backdrop-blur-sm rounded-2xl border-white/20">
             <label
               htmlFor="floorLevelInput"
-              className="text-sm font-semibold text-blue-400"
+              className="flex items-center gap-2 mb-3 text-sm font-bold text-gray-800"
             >
-              Floor level
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600">
+                <i className={`${PrimeIcons.BUILDING} text-sm text-white`}></i>
+              </div>
+              Floor Level
             </label>
             <IconField id="floorLevelInput" iconPosition="left">
-              <InputIcon className={`${PrimeIcons.BUILDING}`}></InputIcon>
+              <InputIcon
+                className={`${PrimeIcons.HASHTAG} text-gray-400`}
+              ></InputIcon>
               <InputText
                 {...register("level", { required: true })}
-                placeholder="1"
+                placeholder="Enter floor level (e.g., 1, 2, 3...)"
                 type="number"
-                className="w-full bg-inherit border-slate-600 text-slate-100 hover:border-blue-400"
+                className="w-full h-12 px-4 text-gray-700 transition-all duration-300 border shadow-lg bg-white/70 backdrop-blur-sm rounded-xl border-white/20 focus:border-blue-400 focus:bg-white/80 hover:bg-white/80"
               />
             </IconField>
             {errors.level && (
-              <small className="flex items-center gap-1 mt-1">
-                <i
-                  className={`${PrimeIcons.EXCLAMATION_CIRCLE} text-sm text-red-400`}
-                ></i>
-                <p className="font-medium text-red-400">
-                  Floor level is required.
-                </p>
-              </small>
+              <div className="flex items-center gap-2 p-3 mt-3 text-red-600 border shadow-lg bg-red-50/70 backdrop-blur-sm rounded-xl border-red-200/20">
+                <i className={`${PrimeIcons.EXCLAMATION_CIRCLE} text-sm`}></i>
+                <span className="text-sm font-medium">
+                  Floor level is required
+                </span>
+              </div>
             )}
           </div>
-          <div className="h-24">
+
+          {/* Floor Name Field */}
+          <div className="p-5 border shadow-lg bg-white/70 backdrop-blur-sm rounded-2xl border-white/20">
             <label
-              htmlFor="floorCodeInput"
-              className="text-sm font-semibold text-blue-400"
+              htmlFor="floorNameInput"
+              className="flex items-center gap-2 mb-3 text-sm font-bold text-gray-800"
             >
-              Floor name
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600">
+                <i
+                  className={`${PrimeIcons.ALIGN_LEFT} text-sm text-white`}
+                ></i>
+              </div>
+              Floor Name
             </label>
-            <IconField id="floorCodeInput" iconPosition="left">
-              <InputIcon className={`${PrimeIcons.ALIGN_LEFT}`}></InputIcon>
+            <IconField id="floorNameInput" iconPosition="left">
+              <InputIcon
+                className={`${PrimeIcons.TAG} text-gray-400`}
+              ></InputIcon>
               <InputText
                 {...register("name", { required: true })}
-                placeholder="First Floor"
-                className="w-full bg-inherit border-slate-600 text-slate-100 hover:border-blue-400"
+                placeholder="Enter floor name (e.g., Ground Floor, First Floor)"
+                className="w-full h-12 px-4 text-gray-700 transition-all duration-300 border shadow-lg bg-white/70 backdrop-blur-sm rounded-xl border-white/20 focus:border-emerald-400 focus:bg-white/80 hover:bg-white/80"
               />
             </IconField>
             {errors.name && (
-              <small className="flex items-center gap-1 mt-1">
-                <i
-                  className={`${PrimeIcons.EXCLAMATION_CIRCLE} text-sm text-red-400`}
-                ></i>
-                <p className="font-medium text-red-400">
-                  Floor name is required.
-                </p>
-              </small>
+              <div className="flex items-center gap-2 p-3 mt-3 text-red-600 border shadow-lg bg-red-50/70 backdrop-blur-sm rounded-xl border-red-200/20">
+                <i className={`${PrimeIcons.EXCLAMATION_CIRCLE} text-sm`}></i>
+                <span className="text-sm font-medium">
+                  Floor name is required
+                </span>
+              </div>
             )}
           </div>
-          <div className="h-24">
+
+          {/* Floor Code Field */}
+          <div className="p-5 border shadow-lg bg-white/70 backdrop-blur-sm rounded-2xl border-white/20">
             <label
               htmlFor="floorCodeInput"
-              className="text-sm font-semibold text-blue-400"
+              className="flex items-center gap-2 mb-3 text-sm font-bold text-gray-800"
             >
-              Floor code
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-600">
+                <i className={`${PrimeIcons.CODE} text-sm text-white`}></i>
+              </div>
+              Floor Code
             </label>
             <IconField id="floorCodeInput" iconPosition="left">
-              <InputIcon className={`${PrimeIcons.BUILDING}`}></InputIcon>
+              <InputIcon
+                className={`${PrimeIcons.BOOKMARK} text-gray-400`}
+              ></InputIcon>
               <InputText
                 {...register("code", { required: true })}
-                placeholder="1F"
+                placeholder="Enter floor code (e.g., 1F, 2F, GF)"
                 maxLength={2}
-                className="w-full bg-inherit border-slate-600 text-slate-100 hover:border-blue-400"
+                className="w-full h-12 px-4 text-gray-700 transition-all duration-300 border shadow-lg bg-white/70 backdrop-blur-sm rounded-xl border-white/20 focus:border-purple-400 focus:bg-white/80 hover:bg-white/80"
               />
             </IconField>
             {errors.code && (
-              <small className="flex items-center gap-1 mt-1">
-                <i
-                  className={`${PrimeIcons.EXCLAMATION_CIRCLE} text-sm text-red-400`}
-                ></i>
-                <p className="font-medium text-red-400">
-                  Floor code is required.
-                </p>
-              </small>
+              <div className="flex items-center gap-2 p-3 mt-3 text-red-600 border shadow-lg bg-red-50/70 backdrop-blur-sm rounded-xl border-red-200/20">
+                <i className={`${PrimeIcons.EXCLAMATION_CIRCLE} text-sm`}></i>
+                <span className="text-sm font-medium">
+                  Floor code is required
+                </span>
+              </div>
             )}
           </div>
+
+          {/* Submit Button */}
           <Button
             type="submit"
-            className="justify-center w-full h-10 gap-2 mt-2 font-medium"
-            icon={`${PrimeIcons.PLUS}`}
+            className="w-full py-4 text-white transition-all duration-300 transform border-none shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl hover:from-blue-600 hover:to-indigo-700 hover:scale-105"
+            icon={`${PrimeIcons.PLUS} mr-2`}
           >
-            Create floor
+            <span className="text-lg font-semibold">Create Floor</span>
           </Button>
         </form>
       </Dialog>
