@@ -2,7 +2,7 @@ import FloorRoomsTable from "./FloorRoomsTable";
 
 const RoomsPanel = () => {
   return (
-    <div className="text-slate-100">
+    <div className="h-full text-white">
       <FloorRoomsTable />
     </div>
   );

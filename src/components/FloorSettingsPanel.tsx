@@ -30,6 +30,7 @@ const FloorSettingsPanel = () => {
   const param = useParams() as FloorParam;
   const { handleSubmit, register, setValue, getValues } = useForm<FormFields>();
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { setRefresh } = useCrmSidebarSignalStore();
   const { setRefreshFloorHeader } = useFloorPageHeaderStore();
 
@@ -39,6 +40,7 @@ const FloorSettingsPanel = () => {
 
   const accept = async () => {
     const { floorId, code, level, name } = getValues();
+    setIsSubmitting(true);
 
     updateFloorById(floorId, name, code, level)
       .then((response) => {
@@ -54,7 +56,8 @@ const FloorSettingsPanel = () => {
           setIsEditMode(false);
         }
       })
-      .catch((error) => handleErrors(error, toastRef));
+      .catch((error) => handleErrors(error, toastRef))
+      .finally(() => setIsSubmitting(false));
   };
 
   const onSubmit = () => {
@@ -82,92 +85,250 @@ const FloorSettingsPanel = () => {
     setFormFields();
   }, [floor, setValue]);
 
+  const handleCancel = () => {
+    // Reset form values to original
+    setValue("name", floor?.name);
+    setValue("level", floor?.level);
+    setValue("code", floor?.code);
+    setIsEditMode(false);
+  };
+
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="w-full pt-4 h-80 text-slate-100"
-    >
+    <div className="flex flex-col w-full overflow-hidden bg-white border shadow-sm h-80 rounded-xl border-slate-200">
       <CustomToast ref={toastRef} />
-      <ScrollPanel style={{ height: "calc(72vh - 200px)" }} className="mb-5">
-        <div className="flex justify-between w-full">
-          <p className="w-full">Floor name</p>
-          <IconField iconPosition="left" className="w-full">
-            <InputIcon className={PrimeIcons.USER}> </InputIcon>
-            <InputText
-              {...register("name")}
-              disabled={!isEditMode}
-              placeholder="Ground Floor"
-              className="w-full h-10 bg-inherit text-slate-100"
-            />
-          </IconField>
-          <div className="flex items-center justify-end w-full"></div>
-        </div>
-        <Divider />
 
-        <div className="flex justify-between w-full">
-          <p className="w-full">Floor code</p>
-          <IconField iconPosition="left" className="w-full">
-            <InputIcon className={PrimeIcons.USER}> </InputIcon>
-            <InputText
-              {...register("code")}
-              disabled={!isEditMode}
-              placeholder="GF"
-              maxLength={2}
-              className="w-full h-10 bg-inherit text-slate-100"
-            />
-          </IconField>
-          <div className="flex items-center justify-end w-full"></div>
-        </div>
+      {/* Header */}
+      <div className="relative flex-shrink-0 px-6 py-4 border-b bg-gradient-to-r from-slate-50 to-slate-100 border-slate-200">
+        <div className="absolute inset-0 opacity-50 bg-gradient-to-br from-slate-50 to-slate-100"></div>
+        <div className="relative flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-200">
+              <svg
+                className="w-4 h-4 text-slate-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-slate-800">
+                Floor Settings
+              </h3>
+              <p className="text-sm text-slate-600">
+                Configure floor details and properties
+              </p>
+            </div>
+          </div>
 
-        <Divider />
-
-        <div className="flex justify-between w-full">
-          <p className="w-full">Floor level</p>
-          <IconField iconPosition="left" className="w-full">
-            <InputIcon className={PrimeIcons.USER}> </InputIcon>
-            <InputText
-              {...register("level")}
-              disabled={!isEditMode}
-              placeholder="0"
-              className="w-full h-10 bg-inherit text-slate-100"
-            />
-          </IconField>
-          <div className="flex items-center justify-end w-full"></div>
+          {/* Status indicator */}
+          <div className="flex items-center space-x-2">
+            <div
+              className={`w-2 h-2 rounded-full ${
+                isEditMode ? "bg-orange-400" : "bg-green-400"
+              }`}
+            ></div>
+            <span className="text-sm font-medium text-slate-600">
+              {isEditMode ? "Edit Mode" : "View Mode"}
+            </span>
+          </div>
         </div>
-      </ScrollPanel>
-      <div className="flex justify-end gap-2">
-        {isEditMode && (
-          <Button
-            className="w-52"
-            severity="danger"
-            type="button"
-            icon={`${PrimeIcons.SIGN_OUT} mr-2 text-xl`}
-            onClick={() => setIsEditMode(false)}
-          >
-            Cancel
-          </Button>
-        )}
-        {isEditMode && (
-          <Button
-            className="w-52"
-            type="submit"
-            icon={`${PrimeIcons.SAVE} mr-2 text-xl`}
-          >
-            Save
-          </Button>
-        )}
-        {!isEditMode && (
-          <Button
-            className="w-52"
-            type="button"
-            onClick={() => setIsEditMode(true)}
-            icon={`${PrimeIcons.USER_EDIT} mr-2 text-xl`}
-          >
-            Edit
-          </Button>
-        )}
       </div>
-    </form>
+
+      {/* Content - Scrollable */}
+      <div className="flex-1 overflow-hidden">
+        <ScrollPanel style={{ height: "100%" }} className="h-full">
+          <form
+            id="floor-settings-form"
+            onSubmit={handleSubmit(onSubmit)}
+            className="p-6 space-y-6"
+          >
+            {/* Floor Name */}
+            <div className="group">
+              <div className="flex items-center justify-between mb-3">
+                <label className="flex items-center text-sm font-medium text-slate-700">
+                  <svg
+                    className="w-4 h-4 mr-2 text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                    />
+                  </svg>
+                  Floor Name
+                </label>
+                {isEditMode && (
+                  <span className="px-2 py-1 text-xs rounded-full text-slate-500 bg-slate-100">
+                    Required
+                  </span>
+                )}
+              </div>
+              <div className="relative">
+                <IconField iconPosition="left" className="w-full">
+                  <InputIcon className={PrimeIcons.HOME}></InputIcon>
+                  <InputText
+                    {...register("name")}
+                    disabled={!isEditMode}
+                    placeholder="Ground Floor"
+                    className={`w-full h-12 transition-all duration-200 ${
+                      !isEditMode
+                        ? "bg-slate-50 border-slate-200 text-slate-700"
+                        : "bg-white border-slate-300 text-slate-900 focus:border-slate-500 focus:shadow-sm"
+                    }`}
+                  />
+                </IconField>
+              </div>
+            </div>
+
+            <Divider className="my-6 border-slate-200" />
+
+            {/* Floor Code */}
+            <div className="group">
+              <div className="flex items-center justify-between mb-3">
+                <label className="flex items-center text-sm font-medium text-slate-700">
+                  <svg
+                    className="w-4 h-4 mr-2 text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                    />
+                  </svg>
+                  Floor Code
+                </label>
+                {isEditMode && (
+                  <span className="px-2 py-1 text-xs rounded-full text-slate-500 bg-slate-100">
+                    Max 2 chars
+                  </span>
+                )}
+              </div>
+              <div className="relative">
+                <IconField iconPosition="left" className="w-full">
+                  <InputIcon className={PrimeIcons.TAG}></InputIcon>
+                  <InputText
+                    {...register("code")}
+                    disabled={!isEditMode}
+                    placeholder="GF"
+                    maxLength={2}
+                    className={`w-full h-12 transition-all duration-200 ${
+                      !isEditMode
+                        ? "bg-slate-50 border-slate-200 text-slate-700"
+                        : "bg-white border-slate-300 text-slate-900 focus:border-slate-500 focus:shadow-sm"
+                    }`}
+                  />
+                </IconField>
+              </div>
+            </div>
+
+            <Divider className="my-6 border-slate-200" />
+
+            {/* Floor Level */}
+            <div className="group">
+              <div className="flex items-center justify-between mb-3">
+                <label className="flex items-center text-sm font-medium text-slate-700">
+                  <svg
+                    className="w-4 h-4 mr-2 text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                    />
+                  </svg>
+                  Floor Level
+                </label>
+                {isEditMode && (
+                  <span className="px-2 py-1 text-xs rounded-full text-slate-500 bg-slate-100">
+                    Numeric
+                  </span>
+                )}
+              </div>
+              <div className="relative">
+                <IconField iconPosition="left" className="w-full">
+                  <InputIcon className={PrimeIcons.SORT_NUMERIC_UP}></InputIcon>
+                  <InputText
+                    {...register("level")}
+                    disabled={!isEditMode}
+                    placeholder="0"
+                    type="number"
+                    className={`w-full h-12 transition-all duration-200 ${
+                      !isEditMode
+                        ? "bg-slate-50 border-slate-200 text-slate-700"
+                        : "bg-white border-slate-300 text-slate-900 focus:border-slate-500 focus:shadow-sm"
+                    }`}
+                  />
+                </IconField>
+              </div>
+            </div>
+          </form>
+        </ScrollPanel>
+      </div>
+
+      {/* Actions - Always visible at bottom, outside of form and scroll */}
+      <div className="flex-shrink-0 px-6 py-4 border-t bg-slate-50 border-slate-200">
+        <div className="flex justify-end gap-3">
+          {isEditMode ? (
+            <>
+              <Button
+                className="h-10 px-4 py-2 transition-all duration-200 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400"
+                severity="secondary"
+                type="button"
+                icon={`${PrimeIcons.TIMES} mr-2`}
+                onClick={handleCancel}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="h-10 px-4 py-2 text-white transition-all duration-200 bg-slate-900 hover:bg-slate-800"
+                type="submit"
+                form="floor-settings-form"
+                icon={`${PrimeIcons.SAVE} mr-2`}
+                disabled={isSubmitting}
+                loading={isSubmitting}
+              >
+                {isSubmitting ? "Saving..." : "Save Changes"}
+              </Button>
+            </>
+          ) : (
+            <Button
+              className="h-10 px-4 py-2 font-medium text-white transition-all duration-200 shadow-sm bg-slate-900 hover:bg-slate-800"
+              type="button"
+              onClick={() => setIsEditMode(true)}
+              icon={`${PrimeIcons.PENCIL} mr-2`}
+            >
+              Edit Floor
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

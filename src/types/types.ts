@@ -1,3 +1,5 @@
+import { TabPanel } from "primereact/tabview";
+import { IconType } from "primereact/utils";
 import { ReactNode } from "react";
 
 type Route = {
@@ -68,7 +70,7 @@ type Room = {
 type Panel = {
   header: string;
   panel: ReactNode;
-  icon: string;
+  icon: string | IconType<TabPanel> | ReactNode;
 };
 
 type User = {
@@ -107,6 +109,15 @@ type FloorParam = {
   floorId: string;
 };
 
+type Doctor = {
+  id: number;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+
+  specializationId: number;
+};
+
 type ArrowDimension = {
   pointerLength: number;
   pointerWidth: number;
@@ -125,14 +136,7 @@ type Item = {
   description: string;
 };
 
-type Doctor = {
-  firstName: string;
-  middleName: string;
-  lastName: string;
-};
-
 export type {
-  Doctor,
   Item,
   ArrowDimension,
   Route,
@@ -149,5 +153,6 @@ export type {
   ForgotPassword,
   FloorParam,
   ArrowType,
+  Doctor,
   RoomImage,
 };

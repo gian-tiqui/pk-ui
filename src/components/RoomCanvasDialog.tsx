@@ -39,11 +39,17 @@ const ARROW_DIMENSION: ArrowDimension = {
   fill: "black",
 };
 
+// Maximum canvas dimensions
+const MAX_CANVAS_WIDTH = 800;
+const MAX_CANVAS_HEIGHT = 600;
+
 const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
   const toastRef = useRef<Toast>(null);
   const param = useParams() as FloorParam;
   const stageRef = useRef<StageType | null>(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
+  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+  const [scale, setScale] = useState(1);
   const [arrows, setArrows] = useState<ArrowType[]>([]);
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [currentArrow, setCurrentArrow] = useState<ArrowType | null>(null);
@@ -122,10 +128,33 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
       img.src = imgSrc;
       img.onload = () => {
         setBgImage(img);
-        setStageSize({ width: img.width, height: img.height });
+        setImageSize({ width: img.width, height: img.height });
+
+        // Calculate scale to fit within max dimensions
+        const scaleX = MAX_CANVAS_WIDTH / img.width;
+        const scaleY = MAX_CANVAS_HEIGHT / img.height;
+        const calculatedScale = Math.min(scaleX, scaleY, 1); // Don't scale up
+
+        setScale(calculatedScale);
+        setStageSize({
+          width: img.width * calculatedScale,
+          height: img.height * calculatedScale,
+        });
       };
     }
   }, [floor]);
+
+  // Convert screen coordinates to image coordinates
+  const screenToImageCoords = (x: number, y: number) => ({
+    x: x / scale,
+    y: y / scale,
+  });
+
+  // Convert image coordinates to screen coordinates
+  // const imageToScreenCoords = (x: number, y: number) => ({
+  //   x: x * scale,
+  //   y: y * scale,
+  // });
 
   const handleMouseDown = () => {
     setIsDrawing(true);
@@ -135,7 +164,11 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
     const point = stage.getPointerPosition();
     if (!point) return;
 
-    setCurrentArrow({ points: [point.x, point.y, point.x, point.y] });
+    // Convert to image coordinates for storage
+    const imagePoint = screenToImageCoords(point.x, point.y);
+    setCurrentArrow({
+      points: [imagePoint.x, imagePoint.y, imagePoint.x, imagePoint.y],
+    });
   };
 
   const handleMouseMove = () => {
@@ -147,12 +180,14 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
     const point = stage.getPointerPosition();
     if (!point) return;
 
+    // Convert to image coordinates for storage
+    const imagePoint = screenToImageCoords(point.x, point.y);
     setCurrentArrow({
       points: [
         currentArrow.points[0],
         currentArrow.points[1],
-        point.x,
-        point.y,
+        imagePoint.x,
+        imagePoint.y,
       ],
     });
   };
@@ -263,6 +298,8 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
         }
       }}
       header={`Directions Editor for ${room?.name}`}
+      style={{ width: "auto" }}
+      maximizable
     >
       <CustomToast ref={toastRef} />
       <div className="flex justify-between w-full gap-2 mb-2">
@@ -353,49 +390,81 @@ const RoomCanvasDialog: React.FC<Props> = ({ roomId, visible, setVisible }) => {
           />
         </div>
       </div>
+      <div className="mb-2 text-sm text-gray-400">
+        Scale: {(scale * 100).toFixed(0)}% | Original: {imageSize.width}×
+        {imageSize.height} | Display: {stageSize.width.toFixed(0)}×
+        {stageSize.height.toFixed(0)}
+      </div>
       {bgImage && (
-        <Stage
-          width={stageSize.width}
-          height={stageSize.height}
-          ref={stageRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          style={{ border: "1px solid black" }}
-        >
-          <Layer>
-            <Image
-              image={bgImage}
-              x={0}
-              y={0}
-              width={stageSize.width}
-              height={stageSize.height}
-            />
+        <div style={{ overflow: "auto", maxHeight: "70vh" }}>
+          <Stage
+            width={stageSize.width}
+            height={stageSize.height}
+            ref={stageRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            style={{ border: "1px solid black" }}
+          >
+            <Layer>
+              <Image
+                image={bgImage}
+                x={0}
+                y={0}
+                width={stageSize.width}
+                height={stageSize.height}
+              />
 
-            {arrows.map((arrow, index) => {
-              const { midX, midY } = getArrowMidpoint(arrow.points);
+              {arrows.map((arrow, index) => {
+                // Convert stored image coordinates to screen coordinates for display
+                const screenPoints = [
+                  arrow.points[0] * scale,
+                  arrow.points[1] * scale,
+                  arrow.points[2] * scale,
+                  arrow.points[3] * scale,
+                ];
 
-              return (
-                <React.Fragment key={index}>
-                  <Arrow points={arrow.points} {...arrowDimension} />
+                const { midX, midY } = getArrowMidpoint(screenPoints);
 
-                  <Text
-                    x={midX + 10}
-                    y={midY - 20}
-                    text={`${index + 1}`}
-                    fontSize={15}
-                    fill="black"
-                    align="center"
-                  />
-                </React.Fragment>
-              );
-            })}
+                return (
+                  <React.Fragment key={index}>
+                    <Arrow
+                      points={screenPoints}
+                      {...arrowDimension}
+                      strokeWidth={arrowDimension.strokeWidth * scale}
+                      pointerLength={arrowDimension.pointerLength * scale}
+                      pointerWidth={arrowDimension.pointerWidth * scale}
+                    />
 
-            {currentArrow && (
-              <Arrow points={currentArrow.points} {...arrowDimension} />
-            )}
-          </Layer>
-        </Stage>
+                    <Text
+                      x={midX + 10}
+                      y={midY - 20}
+                      text={`${index + 1}`}
+                      fontSize={15 * scale}
+                      fill="black"
+                      align="center"
+                    />
+                  </React.Fragment>
+                );
+              })}
+
+              {currentArrow && (
+                <Arrow
+                  points={[
+                    currentArrow.points[0] * scale,
+                    currentArrow.points[1] * scale,
+                    currentArrow.points[2] * scale,
+                    currentArrow.points[3] * scale,
+                  ]}
+                  {...arrowDimension}
+                  strokeWidth={arrowDimension.strokeWidth * scale}
+                  pointerLength={arrowDimension.pointerLength * scale}
+                  pointerWidth={arrowDimension.pointerWidth * scale}
+                />
+              )}
+            </Layer>
+          </Stage>
+        </div>
       )}
     </Dialog>
   );
