@@ -7,7 +7,6 @@ import { FloorParam, Query, Room } from "../types/types";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import { PrimeIcons } from "primereact/api";
 import { InputText } from "primereact/inputtext";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
@@ -19,6 +18,15 @@ import handleErrors from "../@utils/functions/handleErrors";
 import { OverlayPanel } from "primereact/overlaypanel";
 import CustomToast from "./CustomToast";
 import DeleteRoomDialog from "./DeleteRoomDialog";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  RotateCcw,
+  Settings,
+  Undo,
+  Trash2,
+} from "lucide-react";
 
 interface Props {
   isDeleted?: boolean;
@@ -82,7 +90,6 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
 
   const handleNextPageClicked = () => {
     if (isNextDisabled) return;
-
     setQuery((prev) => ({
       ...prev,
       offset: (prev.offset ?? 0) + (prev.limit ?? 5),
@@ -91,7 +98,6 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
 
   const handlePrevPageClicked = () => {
     if (isPrevDisabled) return;
-
     setQuery((prev) => ({
       ...prev,
       offset: Math.max((prev.offset ?? 0) - (prev.limit ?? 5), 0),
@@ -117,12 +123,12 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
     confirmDialog({
       message: (
         <p>
-          Do you want to <span className="text-blue-400">retrieve</span> this
+          Do you want to <span className="text-blue-600">retrieve</span> this
           room?
         </p>
       ),
       header: "Retrieve Room",
-      icon: PrimeIcons.QUESTION_CIRCLE,
+      icon: "pi pi-question-circle",
       defaultFocus: "reject",
       accept,
     });
@@ -137,18 +143,18 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
       message: (
         <p>
           Do you want to{" "}
-          <span className="text-red-500">permanently delete</span> this room?
+          <span className="text-red-600">permanently delete</span> this room?
         </p>
       ),
       header: "Delete Room",
-      icon: PrimeIcons.QUESTION_CIRCLE,
+      icon: "pi pi-question-circle",
       defaultFocus: "reject",
       accept: acceptRemoveRoom,
     });
   };
 
   return (
-    <section>
+    <div className="h-full">
       <CustomToast ref={toastRef} />
       <RoomSettingsDialog
         roomId={selectedRoomId}
@@ -160,175 +166,214 @@ const FloorRoomsTable: React.FC<Props> = ({ isDeleted = false }) => {
         setVisible={setVisible}
         selectedRoomId={selectedRoomId}
       />
-      <div className="flex items-center justify-between">
-        <div className="flex items-center w-full">
-          <p className="text-lg font-medium text-slate-100">
-            Total number of rooms: {data?.count}
-          </p>
+
+      {/* Header with Stats and Controls */}
+      <div className="flex items-center justify-between p-4 mb-4 border shadow-lg bg-white/80 backdrop-blur-sm rounded-2xl border-slate-200/60">
+        <div className="flex items-center gap-4">
+          <div className="px-4 py-2 border shadow-lg bg-white/60 backdrop-blur-sm rounded-xl border-slate-200/60">
+            <span className="text-sm text-slate-600">Total Rooms: </span>
+            <span className="font-bold text-slate-800">{data?.count || 0}</span>
+          </div>
         </div>
-        <div className="flex justify-end w-full gap-2 mb-4">
+
+        <div className="flex items-center gap-2">
           <Button
-            className="w-10 h-10"
-            icon={PrimeIcons.BACKWARD}
+            className="flex items-center justify-center w-10 h-10 transition-all duration-300 border-none shadow-lg text-slate-700 bg-white/60 backdrop-blur-sm rounded-xl hover:bg-white/80 disabled:opacity-50"
             tooltip="Previous Page"
             tooltipOptions={{ position: "bottom" }}
             onClick={handlePrevPageClicked}
             disabled={isPrevDisabled}
-          />
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
 
           <Button
-            className="w-10 h-10"
-            icon={PrimeIcons.FORWARD}
+            className="flex items-center justify-center w-10 h-10 transition-all duration-300 border-none shadow-lg text-slate-700 bg-white/60 backdrop-blur-sm rounded-xl hover:bg-white/80 disabled:opacity-50"
             tooltip="Next Page"
             tooltipOptions={{ position: "bottom" }}
             onClick={handleNextPageClicked}
             disabled={isNextDisabled}
-          />
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
 
-          <IconField iconPosition="left">
-            <InputIcon className="pi pi-search"> </InputIcon>
+          <IconField iconPosition="left" className="ml-2">
+            <InputIcon>
+              <Search className="w-4 h-4 text-slate-500" />
+            </InputIcon>
             <InputText
               onChange={(e) => setSearchInput(e.target.value)}
               value={searchInput}
-              placeholder="Search"
-              className="h-10 border bg-inherit border-slate-600 text-slate-100"
+              placeholder="Search rooms..."
+              className="h-10 pl-10 border shadow-lg text-slate-700 placeholder-slate-400 bg-white/60 backdrop-blur-sm border-slate-200/60 rounded-xl focus:border-blue-400"
             />
           </IconField>
 
           <Button
-            className="w-10 h-10"
+            className="flex items-center justify-center w-10 h-10 transition-all duration-300 border-none shadow-lg text-slate-700 bg-white/60 backdrop-blur-sm rounded-xl hover:bg-white/80"
             tooltip="Clear Filters"
-            icon={`${PrimeIcons.UNDO}`}
             tooltipOptions={{ position: "bottom" }}
             onClick={() => {
               setQuery(defaultQuery);
               setSearchInput("");
               dataTableRef.current?.reset();
             }}
-          ></Button>
+          >
+            <RotateCcw className="w-4 h-4" />
+          </Button>
         </div>
       </div>
 
-      <DataTable
-        ref={dataTableRef}
-        value={data?.rooms}
-        size="small"
-        pt={{
-          bodyRow: { className: "bg-slate-900" },
-          headerRow: { className: "bg-slate-900" },
-        }}
-      >
-        <Column
+      {/* Data Table */}
+      <div className="border shadow-lg bg-white/40 backdrop-blur-sm rounded-2xl border-slate-200/60">
+        <DataTable
+          ref={dataTableRef}
+          value={data?.rooms}
+          size="small"
+          className="text-slate-800"
           pt={{
-            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
-            sortIcon: { className: "text-slate-100" },
+            wrapper: { className: "rounded-2xl overflow-hidden" },
+            header: {
+              className: "bg-white/60 backdrop-blur-sm border-slate-200/60",
+            },
+            bodyRow: {
+              className:
+                "bg-white/30 hover:bg-white/50 transition-all duration-200 border-slate-200/40",
+            },
+            headerRow: {
+              className: "bg-white/60 backdrop-blur-sm border-slate-200/60",
+            },
           }}
-          sortable
-          field="name"
-          className="text-slate-100"
-          header="Name"
-        />
-        <Column
-          pt={{
-            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
-            sortIcon: { className: "text-slate-100" },
-          }}
-          sortable
-          field="code"
-          className="text-slate-100"
-          header="Code"
-        />
-        <Column
-          pt={{
-            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
-            sortIcon: { className: "text-slate-100" },
-          }}
-          sortable
-          field="status"
-          className="text-slate-100"
-          header="Status"
-        />
-        <Column
-          pt={{
-            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
-            sortIcon: { className: "text-slate-100" },
-          }}
-          sortable
-          field="createdAt"
-          className="text-slate-100"
-          header="Created At"
-        />
-        <Column
-          pt={{
-            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
-            sortIcon: { className: "text-slate-100" },
-          }}
-          sortable
-          field="updatedAt"
-          className="text-slate-100"
-          header="Updated At"
-        />
-        <Column
-          pt={{
-            headerCell: { className: "bg-slate-950 h-14 text-slate-100" },
-          }}
-          header="Action"
-          body={(rowData) => (
-            <>
-              {isDeleted ? (
-                <>
-                  <OverlayPanel
-                    ref={overlayPanelRef}
-                    className=" bg-slate-800"
-                    pt={{ content: { className: "flex gap-3 flex-col p-3" } }}
-                  >
-                    <Button
-                      className="h-10 "
-                      icon={`${PrimeIcons.UNDO} me-2`}
-                      onClick={() => {
-                        handleRetrieveFloorButtonClicked();
+        >
+          <Column
+            pt={{
+              headerCell: {
+                className:
+                  "bg-white/60 backdrop-blur-sm h-14 text-slate-800 font-semibold border-slate-200/60",
+              },
+              sortIcon: { className: "text-slate-700" },
+              bodyCell: { className: "text-slate-800 border-slate-200/40" },
+            }}
+            sortable
+            field="name"
+            header="Name"
+          />
+          <Column
+            pt={{
+              headerCell: {
+                className:
+                  "bg-white/60 backdrop-blur-sm h-14 text-slate-800 font-semibold border-slate-200/60",
+              },
+              sortIcon: { className: "text-slate-700" },
+              bodyCell: { className: "text-slate-800 border-slate-200/40" },
+            }}
+            sortable
+            field="code"
+            header="Code"
+          />
+          <Column
+            pt={{
+              headerCell: {
+                className:
+                  "bg-white/60 backdrop-blur-sm h-14 text-slate-800 font-semibold border-slate-200/60",
+              },
+              sortIcon: { className: "text-slate-700" },
+              bodyCell: { className: "text-slate-800 border-slate-200/40" },
+            }}
+            sortable
+            field="status"
+            header="Status"
+          />
+          <Column
+            pt={{
+              headerCell: {
+                className:
+                  "bg-white/60 backdrop-blur-sm h-14 text-slate-800 font-semibold border-slate-200/60",
+              },
+              sortIcon: { className: "text-slate-700" },
+              bodyCell: { className: "text-slate-800 border-slate-200/40" },
+            }}
+            sortable
+            field="createdAt"
+            header="Created At"
+          />
+          <Column
+            pt={{
+              headerCell: {
+                className:
+                  "bg-white/60 backdrop-blur-sm h-14 text-slate-800 font-semibold border-slate-200/60",
+              },
+              sortIcon: { className: "text-slate-700" },
+              bodyCell: { className: "text-slate-800 border-slate-200/40" },
+            }}
+            sortable
+            field="updatedAt"
+            header="Updated At"
+          />
+          <Column
+            pt={{
+              headerCell: {
+                className:
+                  "bg-white/60 backdrop-blur-sm h-14 text-slate-800 font-semibold border-slate-200/60",
+              },
+              bodyCell: { className: "text-slate-800 border-slate-200/40" },
+            }}
+            header="Action"
+            body={(rowData) => (
+              <>
+                {isDeleted ? (
+                  <>
+                    <OverlayPanel
+                      ref={overlayPanelRef}
+                      className="border shadow-xl bg-white/90 backdrop-blur-sm border-slate-200/60 rounded-xl"
+                      pt={{
+                        content: { className: "flex gap-3 flex-col p-4" },
                       }}
                     >
-                      Restore
-                    </Button>
+                      <Button
+                        className="flex items-center gap-2 px-4 py-2 text-white transition-all duration-300 border-none shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl hover:from-blue-600 hover:to-indigo-700"
+                        onClick={handleRetrieveFloorButtonClicked}
+                      >
+                        <Undo className="w-4 h-4" />
+                        Restore
+                      </Button>
+                      <Button
+                        className="flex items-center gap-2 px-4 py-2 text-white transition-all duration-300 border-none shadow-lg bg-gradient-to-r from-red-500 to-rose-600 rounded-xl hover:from-red-600 hover:to-rose-700"
+                        onClick={handleRemoveFloorButtonClicked}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </Button>
+                    </OverlayPanel>
                     <Button
-                      className="h-10 "
-                      severity="danger"
-                      icon={`${PrimeIcons.TRASH} me-2`}
-                      onClick={() => {
-                        handleRemoveFloorButtonClicked();
+                      className="flex items-center justify-center w-10 h-10 transition-all duration-300 border-none shadow-lg text-slate-700 bg-white/60 backdrop-blur-sm rounded-xl hover:bg-white/80"
+                      onClick={(e) => {
+                        setSelectedRoomId(rowData.id);
+                        overlayPanelRef.current?.toggle(e);
                       }}
                     >
-                      Delete
+                      <Settings className="w-4 h-4" />
                     </Button>
-                  </OverlayPanel>
+                  </>
+                ) : (
                   <Button
-                    className="w-10 h-10"
-                    icon={PrimeIcons.COG}
-                    onClick={(e) => {
+                    className="flex items-center justify-center w-10 h-10 text-white transition-all duration-300 border-none shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl hover:from-blue-600 hover:to-indigo-700"
+                    tooltip="Open settings"
+                    tooltipOptions={{ position: "bottom" }}
+                    onClick={() => {
                       setSelectedRoomId(rowData.id);
-                      overlayPanelRef.current?.toggle(e);
+                      setRoomSettingVisisble(true);
                     }}
-                  ></Button>
-                </>
-              ) : (
-                <Button
-                  className="w-10 h-10"
-                  icon={PrimeIcons.COG}
-                  tooltip="Open settings"
-                  tooltipOptions={{ position: "bottom" }}
-                  onClick={() => {
-                    setSelectedRoomId(rowData.id);
-
-                    setRoomSettingVisisble(true);
-                  }}
-                ></Button>
-              )}
-            </>
-          )}
-        />
-      </DataTable>
-    </section>
+                  >
+                    <Settings className="w-4 h-4" />
+                  </Button>
+                )}
+              </>
+            )}
+          />
+        </DataTable>
+      </div>
+    </div>
   );
 };
 

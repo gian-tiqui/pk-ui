@@ -186,7 +186,7 @@ const FindAmenityPage = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-800">
-                WMC Amenity Finder
+                WMC Hospital Directory
               </h1>
               <p className="text-gray-600">Navigate to your destination</p>
             </div>
