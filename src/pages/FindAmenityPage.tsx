@@ -88,6 +88,24 @@ const FindAmenityPage = () => {
     if (data) setCompleteFloors(filterCompleteCloor(data?.floors));
   }, [data]);
 
+  useEffect(() => {
+    return () => {
+      timeoutsRef.current.forEach((timeoutId) =>
+        window.clearTimeout(timeoutId)
+      );
+      setDelayedArrows([]);
+      setBgImage(null);
+      setStageSize({ width: 0, height: 0 });
+      setSelectedFloor(undefined);
+      setSelectedRoom(undefined);
+      setStartingPoint(StartingPoint.FRONT_ELEVATOR); // Reset to default starting point
+      if (stageRef.current) {
+        stageRef.current.destroy();
+        stageRef.current = null;
+      }
+    };
+  }, [setSelectedFloor, setSelectedRoom, setStartingPoint]);
+
   // Load floor map image
   useEffect(() => {
     if (selectedFloor?.imageLocation) {
@@ -180,7 +198,7 @@ const FindAmenityPage = () => {
   return (
     <PageTemplate>
       <Toast ref={toastRef} />
-      <main className="flex flex-col h-screen p-4 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <main className="flex flex-col h-screen p-4 overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
@@ -211,12 +229,13 @@ const FindAmenityPage = () => {
               <RefreshCw className="w-4 h-4 mr-2" />
               Reset
             </Button>
-            <button
+            <Button
               onClick={() => navigate("/")}
-              className="flex items-center justify-center w-10 h-10 transition-all duration-300 bg-gray-100 rounded-full shadow-lg hover:bg-gray-200 hover:shadow-xl"
+              rounded
+              className="p-2 text-gray-600 transition-all duration-300 border-none shadow-lg bg-white/70 backdrop-blur-sm rounded-2xl hover:bg-white/80"
             >
               <LogOut className="w-5 h-5 text-gray-600 rotate-180" />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -352,7 +371,7 @@ const FindAmenityPage = () => {
 
               <div className="flex items-center justify-center h-full overflow-hidden rounded-2xl bg-gray-50">
                 {selectedFloor && bgImage ? (
-                  <div className="relative max-w-full max-h-full">
+                  <div className="relative flex items-center justify-center w-full h-full">
                     <Stage
                       width={Math.min(stageSize.width, 800)}
                       height={Math.min(stageSize.height, 600)}
@@ -367,7 +386,7 @@ const FindAmenityPage = () => {
                         600 / stageSize.height,
                         1
                       )}
-                      className="border-2 border-gray-200 rounded-xl"
+                      className="max-w-full max-h-full border-2 border-gray-200 rounded-xl"
                     >
                       <Layer>
                         <KonvaImage
