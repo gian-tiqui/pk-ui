@@ -9,7 +9,7 @@ const MainMenuButton = () => {
     <Button
       className="absolute justify-center w-40 h-10 gap-4 top-10 left-10"
       onClick={() => {
-        navigate("/main");
+        navigate("/");
       }}
       icon={`${PrimeIcons.HOME}`}
     >
