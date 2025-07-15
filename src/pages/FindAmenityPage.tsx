@@ -35,9 +35,11 @@ import {
   ArrowUp,
   ArrowDown,
   Move,
+  LogOut,
 } from "lucide-react";
 import { useRef } from "react";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const ARROW_DIMENSION: ArrowDimension = {
   pointerLength: 19,
@@ -54,6 +56,7 @@ const FindAmenityPage = () => {
   const [isInfoDialogVisible, setIsInfoDialogVisible] =
     useState<boolean>(false);
   const [imageObjs, setImageObjs] = useState<RoomImage[]>([]);
+  const navigate = useNavigate();
 
   // Floor map states
   const stageRef = useRef<StageType | null>(null);
@@ -208,6 +211,12 @@ const FindAmenityPage = () => {
               <RefreshCw className="w-4 h-4 mr-2" />
               Reset
             </Button>
+            <button
+              onClick={() => navigate("/")}
+              className="flex items-center justify-center w-10 h-10 transition-all duration-300 bg-gray-100 rounded-full shadow-lg hover:bg-gray-200 hover:shadow-xl"
+            >
+              <LogOut className="w-5 h-5 text-gray-600 rotate-180" />
+            </button>
           </div>
         </div>
 
@@ -503,13 +512,6 @@ const FindAmenityPage = () => {
             </TabPanel>
           </TabView>
         </Dialog>
-
-        {/* Footer */}
-        <div className="mt-4 text-center">
-          <p className="text-sm text-gray-500">
-            Select floor • Choose room • Pick starting point • Follow the path
-          </p>
-        </div>
       </main>
     </PageTemplate>
   );

@@ -13,6 +13,7 @@ import {
   ShoppingCart,
   Plus,
   ChevronRight,
+  RefreshCcw,
 } from "lucide-react";
 import { scrollbarTheme } from "../@utils/tw-classes/tw-classes";
 import { CartItem, Service, SubCart } from "../types/types";
@@ -114,34 +115,39 @@ const OrderPage: React.FC = () => {
   };
 
   const decreaseQuantity = (serviceId: number): void => {
+    const targetItem = cartItems.find((item) => item.id === serviceId);
+    const isLastItem = cartItems.length === 1;
+    const isLastQuantity = targetItem?.quantity === 1;
+
+    if (isLastItem && isLastQuantity) {
+      // Show confirmation dialog for removing the last item
+      confirmDialog({
+        message: `Are you sure you want to remove the last item?`,
+        header: "Confirm Removal",
+        icon: "pi pi-exclamation-triangle",
+        accept: () => {
+          // Clear the cart completely
+          setCartItems([]);
+
+          // Clear all doctor selections
+          setDoctorSelections({});
+
+          // Close any open subcart dialog
+          if (subCartDialogVisible) {
+            setSubCartDialogVisible(false);
+            setSelectedSubCart(null);
+          }
+        },
+        reject: () => {
+          // Do nothing - keep the item
+        },
+      });
+      return; // Exit early, don't proceed with normal logic
+    }
+
+    // Normal case - decrease quantity or remove item
     setCartItems((prevItems) => {
-      // First find the item to check if it's the last one with quantity 1
-      const targetItem = prevItems.find((item) => item.id === serviceId);
-      const isLastItem = prevItems.length === 1;
-      const isLastQuantity = targetItem?.quantity === 1;
-
-      if (isLastItem && isLastQuantity) {
-        // Show confirmation dialog before proceeding
-        confirmDialog({
-          message: `Are you sure you want to remove the last item?`,
-          header: "Confirm Removal",
-          icon: "pi pi-exclamation-triangle",
-          accept: () => {
-            // Return empty array if confirmed (remove the item)
-            return [];
-          },
-          reject: () => {
-            // Return previous items if rejected (keep the item)
-            return prevItems;
-          },
-        });
-
-        // Return previous items for now (will be updated in accept/reject callbacks)
-        return prevItems;
-      }
-
-      // Normal case - not the last item or not last quantity
-      return prevItems
+      const newItems = prevItems
         .map((item) => {
           if (item.id === serviceId) {
             const newQuantity = item.quantity - 1;
@@ -151,6 +157,35 @@ const OrderPage: React.FC = () => {
           return item;
         })
         .filter((item) => item.quantity > 0);
+
+      // Check if this removal results in an empty department
+      const removedItem = prevItems.find((item) => item.id === serviceId);
+      if (removedItem && removedItem.quantity === 1) {
+        // Item will be removed, check if department becomes empty
+        const remainingItemsInDept = newItems.filter(
+          (item) => item.departmentId === removedItem.departmentId
+        );
+
+        if (remainingItemsInDept.length === 0) {
+          // Department becomes empty, clear doctor selection
+          setDoctorSelections((prev) => {
+            const newSelections = { ...prev };
+            delete newSelections[removedItem.departmentId];
+            return newSelections;
+          });
+
+          // Close subcart dialog if it's for this department
+          if (
+            selectedSubCart &&
+            selectedSubCart.departmentId === removedItem.departmentId
+          ) {
+            setSubCartDialogVisible(false);
+            setSelectedSubCart(null);
+          }
+        }
+      }
+
+      return newItems;
     });
   };
 
@@ -315,6 +350,10 @@ const OrderPage: React.FC = () => {
     selectedSubCart?.items.length,
   ]);
 
+  const handleClearCart = () => {
+    setCartItems([]);
+  };
+
   return (
     <div className="flex flex-col h-screen p-4 bg-gradient-to-br ice from-slate-50 via-blue-50 to-indigo-100">
       <ConfirmDialog
@@ -420,15 +459,19 @@ const OrderPage: React.FC = () => {
 
         {/* Cart Summary with SubCarts */}
         <div className="p-6 border shadow-xl bg-white/70 backdrop-blur-sm rounded-3xl border-white/20 h-[calc(100vh-105px)] flex flex-col">
-          <h2 className="flex items-center mb-4 text-xl font-bold text-gray-800">
-            <ShoppingCart className="w-5 h-5 mr-2 text-blue-600" />
-            Cart Summary
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="flex items-center text-xl font-bold text-gray-800">
+              <ShoppingCart className="w-5 h-5 mr-2 text-blue-600" />
+              Cart Summary
+            </h2>
+            <RefreshCcw onClick={handleClearCart} className="w-5 h-5" />
+          </div>
+
           <div
             className={`flex-1 pr-1 mb-4 space-y-3 overflow-y-auto overflow-x-hidden ${scrollbarTheme}`}
           >
             {getSubCarts().length === 0 ? (
-              <div className="py-8 text-center">
+              <div className="flex flex-col justify-center h-full text-center">
                 <ShoppingCart className="w-12 h-12 mx-auto mb-2 text-gray-300" />
                 <p className="text-gray-400">Your cart is empty</p>
               </div>
