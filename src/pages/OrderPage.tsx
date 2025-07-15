@@ -18,7 +18,7 @@ import { scrollbarTheme } from "../@utils/tw-classes/tw-classes";
 import { CartItem, Service, SubCart } from "../types/types";
 import KioskHeader from "../components/KioskHeader";
 import { allServices, departments } from "../@utils/data/data";
-import { ConfirmDialog } from "primereact/confirmdialog";
+import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import SubcartDialog from "../components/SubcartDialog";
 import DepartmentServices from "../components/DepartmentServices";
@@ -115,19 +115,42 @@ const OrderPage: React.FC = () => {
 
   const decreaseQuantity = (serviceId: number): void => {
     setCartItems((prevItems) => {
-      const newItems = prevItems
+      // First find the item to check if it's the last one with quantity 1
+      const targetItem = prevItems.find((item) => item.id === serviceId);
+      const isLastItem = prevItems.length === 1;
+      const isLastQuantity = targetItem?.quantity === 1;
+
+      if (isLastItem && isLastQuantity) {
+        // Show confirmation dialog before proceeding
+        confirmDialog({
+          message: `Are you sure you want to remove the last item?`,
+          header: "Confirm Removal",
+          icon: "pi pi-exclamation-triangle",
+          accept: () => {
+            // Return empty array if confirmed (remove the item)
+            return [];
+          },
+          reject: () => {
+            // Return previous items if rejected (keep the item)
+            return prevItems;
+          },
+        });
+
+        // Return previous items for now (will be updated in accept/reject callbacks)
+        return prevItems;
+      }
+
+      // Normal case - not the last item or not last quantity
+      return prevItems
         .map((item) => {
           if (item.id === serviceId) {
             const newQuantity = item.quantity - 1;
             const newSubtotal = item.price * newQuantity;
             return { ...item, quantity: newQuantity, subtotal: newSubtotal };
           }
-
           return item;
         })
         .filter((item) => item.quantity > 0);
-
-      return newItems;
     });
   };
 
