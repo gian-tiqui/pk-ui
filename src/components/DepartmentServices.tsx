@@ -1,14 +1,19 @@
-import { Building2, Badge, ArrowLeft, Plus } from "lucide-react";
+import { Building2, ArrowLeft, Plus } from "lucide-react";
 import { Button } from "primereact/button";
-import React from "react";
+import { Badge } from "primereact/badge";
+import React, { Dispatch, SetStateAction } from "react";
 import { scrollbarTheme } from "../@utils/tw-classes/tw-classes";
-import { Department } from "../types/types";
+import { Department, Service } from "../types/types";
 
 interface Props {
-  selectedDepartment?: Department;
+  selectedDepartment?: number | null;
   departments: Department[];
-  setSelectedDepartment: (id: string | null) => void;
+  setSelectedDepartment: Dispatch<SetStateAction<number | null>>;
   getSelectedDepartmentName: () => string;
+  getServicesForDepartment: (departmentId: number) => Service[];
+  addToCart: (service: Service) => void;
+  departmentIcons: Record<string, React.ComponentType<{ className?: string }>>;
+  getSelectedDepartmentIcon: () => string;
 }
 
 const DepartmentServices: React.FC<Props> = ({
@@ -16,6 +21,9 @@ const DepartmentServices: React.FC<Props> = ({
   departments,
   getSelectedDepartmentName,
   setSelectedDepartment,
+  addToCart,
+  getServicesForDepartment,
+  departmentIcons,
 }) => {
   return (
     <section className="col-span-2 p-6 border shadow-xl bg-white/70 backdrop-blur-sm rounded-3xl border-white/20 h-[calc(100vh-105px)] flex flex-col">
@@ -39,7 +47,13 @@ const DepartmentServices: React.FC<Props> = ({
                     className="p-4 transition-all duration-300 transform bg-white shadow-lg cursor-pointer rounded-2xl hover:scale-105 hover:bg-gray-50"
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <IconComponent className="w-6 h-6 text-blue-600" />
+                      {React.isValidElement(<IconComponent />) ? (
+                        React.cloneElement(<IconComponent />, {
+                          className: "w-6 h-6 text-blue-600",
+                        })
+                      ) : (
+                        <IconComponent />
+                      )}
                       <Badge
                         value={dept.serviceCount}
                         className="text-blue-600 bg-blue-100"
@@ -74,44 +88,46 @@ const DepartmentServices: React.FC<Props> = ({
           <div
             className={`${scrollbarTheme} grid grid-cols-1 gap-3 h-[calc(100%-4rem)] overflow-y-auto pr-2`}
           >
-            {getServicesForDepartment(selectedDepartment).map((service) => (
-              <div
-                key={service.id}
-                className="p-4 transition-all duration-300 transform bg-white shadow-lg cursor-pointer rounded-2xl hover:scale-[1.02] hover:shadow-xl"
-                onClick={() => addToCart(service)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-gray-800">
-                      {service.name}
-                    </h4>
-                    <p className="mt-1 text-sm text-gray-500">
-                      {service.description}
-                    </p>
-                    {service.duration && (
-                      <p className="mt-1 text-xs text-gray-400">
-                        Duration: {service.duration} min
+            {getServicesForDepartment(selectedDepartment as number).map(
+              (service) => (
+                <div
+                  key={service.id}
+                  className="p-4 transition-all duration-300 transform bg-white shadow-lg cursor-pointer rounded-2xl hover:scale-[1.02] hover:shadow-xl"
+                  onClick={() => addToCart(service)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-gray-800">
+                        {service.name}
+                      </h4>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {service.description}
                       </p>
-                    )}
-                  </div>
-                  <div className="ml-4 text-right">
-                    <p className="mb-2 text-lg font-bold text-blue-600">
-                      {service.currency}
-                      {service.price.toLocaleString()}
-                    </p>
-                    <Button
-                      className="flex items-center justify-center w-8 h-8 p-2 text-white transition-all duration-300 border-none rounded-full shadow-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        addToCart(service);
-                      }}
-                    >
-                      <Plus className="w-3 h-3" />
-                    </Button>
+                      {service.duration && (
+                        <p className="mt-1 text-xs text-gray-400">
+                          Duration: {service.duration} min
+                        </p>
+                      )}
+                    </div>
+                    <div className="ml-4 text-right">
+                      <p className="mb-2 text-lg font-bold text-blue-600">
+                        {service.currency}
+                        {service.price.toLocaleString()}
+                      </p>
+                      <Button
+                        className="flex items-center justify-center w-8 h-8 p-2 text-white transition-all duration-300 border-none rounded-full shadow-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addToCart(service);
+                        }}
+                      >
+                        <Plus className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         </>
       )}

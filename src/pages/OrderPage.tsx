@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "primereact/button";
-import { Badge } from "primereact/badge";
-import { Dialog } from "primereact/dialog";
 import {
-  Building2,
   FlaskConical,
   Camera,
   Heart,
@@ -15,18 +12,16 @@ import {
   Star,
   ShoppingCart,
   Plus,
-  ArrowLeft,
-  Minus,
-  X,
   ChevronRight,
-  Package,
 } from "lucide-react";
 import { scrollbarTheme } from "../@utils/tw-classes/tw-classes";
 import { CartItem, Service, SubCart } from "../types/types";
 import KioskHeader from "../components/KioskHeader";
-import { allServices, departments, doctors } from "../@utils/data/data";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { allServices, departments } from "../@utils/data/data";
+import { ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
+import SubcartDialog from "../components/SubcartDialog";
+import DepartmentServices from "../components/DepartmentServices";
 
 const OrderPage: React.FC = () => {
   const toastRef = useRef<Toast>(null);
@@ -36,6 +31,9 @@ const OrderPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedSubCart, setSelectedSubCart] = useState<SubCart | null>(null);
   const [subCartDialogVisible, setSubCartDialogVisible] = useState(false);
+  const [doctorSelections, setDoctorSelections] = useState<{
+    [departmentId: number]: { doctorId: number; doctorName: string };
+  }>({});
 
   // Icon mapping for departments
   const departmentIcons: Record<
@@ -59,6 +57,21 @@ const OrderPage: React.FC = () => {
     doctorId: number | null,
     doctorName?: string | null
   ) => {
+    // Update the persistent doctor selections
+    setDoctorSelections((prev) => {
+      if (doctorId === null) {
+        const newSelections = { ...prev };
+        delete newSelections[departmentId];
+        return newSelections;
+      }
+
+      return {
+        ...prev,
+        [departmentId]: { doctorId, doctorName: doctorName || "" },
+      };
+    });
+
+    // Also update the selected subcart if it matches
     if (selectedSubCart && selectedSubCart.departmentId === departmentId) {
       setSelectedSubCart({
         ...selectedSubCart,
@@ -146,6 +159,14 @@ const OrderPage: React.FC = () => {
     setCartItems(
       cartItems.filter((item) => item.departmentId !== departmentId)
     );
+
+    // Clear doctor selection for this department
+    setDoctorSelections((prev) => {
+      const newSelections = { ...prev };
+      delete newSelections[departmentId];
+      return newSelections;
+    });
+
     if (selectedSubCart && selectedSubCart.departmentId === departmentId) {
       setSubCartDialogVisible(false);
       setSelectedSubCart(null);
@@ -235,6 +256,9 @@ const OrderPage: React.FC = () => {
       const items = departmentGroups[departmentId];
       const department = departments.find((d) => d.id === departmentId);
 
+      // Get the doctor selection for this department
+      const doctorSelection = doctorSelections[departmentId];
+
       return {
         departmentId,
         departmentName: department?.name || "",
@@ -242,11 +266,11 @@ const OrderPage: React.FC = () => {
         items,
         totalItems: items.reduce((sum, item) => sum + item.quantity, 0),
         totalAmount: items.reduce((sum, item) => sum + item.subtotal, 0),
-        selectedDoctorId: null,
-        selectedDoctorName: null,
+        selectedDoctorId: doctorSelection?.doctorId || null,
+        selectedDoctorName: doctorSelection?.doctorName || null,
       };
     });
-  }, [cartItems]);
+  }, [cartItems, doctorSelections]);
 
   useEffect(() => {
     if (selectedSubCart && subCartDialogVisible) {
@@ -256,7 +280,14 @@ const OrderPage: React.FC = () => {
       );
 
       if (updatedSelectedSubCart) {
-        setSelectedSubCart(updatedSelectedSubCart);
+        // Only update if there are actual changes to prevent infinite loop
+        if (
+          updatedSelectedSubCart.totalItems !== selectedSubCart.totalItems ||
+          updatedSelectedSubCart.totalAmount !== selectedSubCart.totalAmount ||
+          updatedSelectedSubCart.items.length !== selectedSubCart.items.length
+        ) {
+          setSelectedSubCart(updatedSelectedSubCart);
+        }
       } else {
         setSubCartDialogVisible(false);
         setSelectedSubCart(null);
@@ -267,7 +298,10 @@ const OrderPage: React.FC = () => {
     selectedSubCart?.departmentId,
     subCartDialogVisible,
     getSubCarts,
-    selectedSubCart,
+    // Remove selectedSubCart from dependencies to prevent infinite loop
+    selectedSubCart?.totalItems,
+    selectedSubCart?.totalAmount,
+    selectedSubCart?.items.length,
   ]);
 
   return (
@@ -280,107 +314,16 @@ const OrderPage: React.FC = () => {
       {/* Main Content */}
       <main className="grid flex-1 grid-cols-4 gap-4">
         {/* Departments or Services Section */}
-        <section className="col-span-2 p-6 border shadow-xl bg-white/70 backdrop-blur-sm rounded-3xl border-white/20 h-[calc(100vh-105px)] flex flex-col">
-          {!selectedDepartment ? (
-            <>
-              <h2 className="flex items-center mb-4 text-xl font-bold text-gray-800">
-                <Building2 className="w-5 h-5 mr-2 text-blue-600" />
-                Medical Departments
-              </h2>
-              <div
-                className={`${scrollbarTheme} grid grid-cols-2 gap-3 h-[calc(100%-3rem)] overflow-y-auto overflow-x-hidden pr-2`}
-              >
-                {departments
-                  .filter((dept) => dept.isActive)
-                  .map((dept) => {
-                    const IconComponent = departmentIcons[dept.icon];
-                    return (
-                      <div
-                        key={dept.id}
-                        onClick={() => setSelectedDepartment(dept.id)}
-                        className="flex flex-col justify-between p-4 transition-all duration-300 transform bg-white shadow-lg cursor-pointer rounded-2xl hover:scale-105 hover:bg-gray-50"
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <IconComponent className="w-6 h-6 text-blue-600" />
-                          <Badge
-                            value={dept.serviceCount}
-                            className="text-blue-600 bg-blue-100"
-                          />
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-semibold text-gray-800">
-                            {dept.name}
-                          </h3>
-                          <p className="text-xs text-gray-500">
-                            {dept.serviceCount} services
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="flex items-center text-xl font-bold text-gray-800">
-                  <Building2 className="w-5 h-5 mr-2 text-blue-600" />
-                  {getSelectedDepartmentName()} Services
-                </h2>
-                <Button
-                  onClick={() => setSelectedDepartment(null)}
-                  className="px-4 py-2 text-gray-600 transition-all duration-300 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back
-                </Button>
-              </div>
-              <div
-                className={`${scrollbarTheme} grid grid-cols-1 gap-3 h-[calc(100%-4rem)] overflow-y-auto pr-2`}
-              >
-                {getServicesForDepartment(selectedDepartment).map((service) => (
-                  <div
-                    key={service.id}
-                    className="p-4 transition-all duration-300 transform bg-white shadow-lg cursor-pointer rounded-2xl hover:scale-[1.02] hover:shadow-xl"
-                    onClick={() => addToCart(service)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-800">
-                          {service.name}
-                        </h4>
-                        <p className="mt-1 text-sm text-gray-500">
-                          {service.description}
-                        </p>
-                        {service.duration && (
-                          <p className="mt-1 text-xs text-gray-400">
-                            Duration: {service.duration} min
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex flex-col items-end justify-between h-full ml-4 text-right">
-                        <p className="mb-2 text-lg font-bold text-blue-600">
-                          {service.currency}
-                          {service.price.toLocaleString()}
-                        </p>
-                        <Button
-                          className="flex items-center justify-center w-8 h-8 p-2 text-white transition-all duration-300 border-none rounded-full shadow-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            addToCart(service);
-                          }}
-                        >
-                          <Plus className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </section>
-
+        <DepartmentServices
+          addToCart={addToCart}
+          departmentIcons={departmentIcons}
+          departments={departments}
+          getSelectedDepartmentIcon={getSelectedDepartmentName}
+          getSelectedDepartmentName={getSelectedDepartmentName}
+          getServicesForDepartment={getServicesForDepartment}
+          selectedDepartment={selectedDepartment}
+          setSelectedDepartment={setSelectedDepartment}
+        />
         {/* Popular Services */}
         <div className="p-6 text-white shadow-xl bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl h-[calc(100vh-105px)] flex flex-col">
           <h2 className="flex items-center mb-4 text-xl font-bold">
@@ -523,163 +466,16 @@ const OrderPage: React.FC = () => {
       </main>
 
       {/* SubCart Detail Dialog */}
-      <Dialog
-        visible={subCartDialogVisible}
-        onHide={() => setSubCartDialogVisible(false)}
-        header={
-          <div className="flex items-center gap-2">
-            <Package className="w-5 h-5 text-blue-600" />
-            <span>{selectedSubCart?.departmentName} Cart</span>
-          </div>
-        }
-        className="w-full max-w-2xl"
-        maskClassName="backdrop-blur-sm bg-gray-900/50"
-        modal
-      >
-        {selectedSubCart && (
-          <div className="space-y-4">
-            {/* Doctor Selector */}
-            <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50">
-              <label className="font-medium text-gray-700">
-                Attending Doctor:
-              </label>
-              <select
-                className="p-2 text-sm border rounded-md"
-                value={selectedSubCart?.selectedDoctorId || ""}
-                onChange={(e) => {
-                  const selectedId = e.target.value
-                    ? parseInt(e.target.value)
-                    : null;
-                  const selectedDoctor = selectedId
-                    ? doctors.find((doc) => doc.id === selectedId)
-                    : null;
-                  updateSubCartDoctor(
-                    selectedSubCart.departmentId,
-                    selectedId,
-                    selectedDoctor
-                      ? `Dr. ${selectedDoctor.firstName} ${selectedDoctor.lastName}`
-                      : null
-                  );
-                }}
-              >
-                <option value="">Select a doctor...</option>
-                {doctors
-                  .filter(
-                    (doc) =>
-                      doc.specializationId === selectedSubCart.departmentId
-                  )
-                  .map((doc) => (
-                    <option key={doc.id} value={doc.id}>
-                      Dr. {doc.firstName} {doc.lastName}
-                    </option>
-                  ))}
-              </select>
-            </div>
-
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-              <div>
-                <h3 className="font-semibold text-gray-800">
-                  {selectedSubCart.departmentName}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {selectedSubCart.totalItems} items
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-xl font-bold text-blue-600">
-                  ₱{selectedSubCart.totalAmount.toLocaleString()}
-                </p>
-                <Button
-                  onClick={() => {
-                    confirmDialog({
-                      message: `Are you sure you want to remove all items from ${selectedSubCart.departmentName}?`,
-                      header: "Confirm Removal",
-                      icon: "pi pi-exclamation-triangle",
-                      accept: () => {
-                        removeAllFromDepartment(selectedSubCart.departmentId);
-                        setSubCartDialogVisible(false);
-                      },
-                    });
-                  }}
-                  className="px-3 py-1 mt-2 text-xs text-red-600 border border-red-200 rounded-lg bg-red-50 hover:bg-red-100"
-                >
-                  Remove All
-                </Button>
-              </div>
-            </div>
-
-            <div className="space-y-3 overflow-y-auto max-h-96">
-              {selectedSubCart.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="relative p-4 bg-white border shadow-sm rounded-xl"
-                >
-                  <button
-                    onClick={() => removeFromCart(item.id)}
-                    className="absolute p-1 text-gray-400 transition-all duration-200 bg-gray-100 rounded-full top-2 right-2 hover:text-red-500 hover:bg-red-50"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-
-                  <div className="pr-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h4 className="text-sm font-semibold text-gray-800">
-                          {item.name}
-                        </h4>
-                        <p className="mt-1 text-xs text-gray-500">
-                          {item.description}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-blue-600">
-                          ₱{item.subtotal.toLocaleString()}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          ₱{item.price.toLocaleString()} each
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center overflow-hidden bg-gray-100 rounded-lg">
-                        <button
-                          onClick={() => decreaseQuantity(item.id)}
-                          className="p-2 text-gray-600 transition-colors hover:bg-gray-200 hover:text-gray-800"
-                        >
-                          <Minus className="w-3 h-3" />
-                        </button>
-                        <span className="px-3 py-2 text-sm font-medium text-gray-800 bg-white min-w-[3rem] text-center">
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() => increaseQuantity(item.id)}
-                          className="p-2 text-gray-600 transition-colors hover:bg-gray-200 hover:text-gray-800"
-                        >
-                          <Plus className="w-3 h-3" />
-                        </button>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        {item.requiresPreparation && (
-                          <span className="px-2 py-1 text-xs text-orange-600 bg-orange-100 rounded-full">
-                            Prep required
-                          </span>
-                        )}
-                        {item.duration && (
-                          <span className="px-2 py-1 text-xs text-blue-600 bg-blue-100 rounded-full">
-                            {item.duration} min
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </Dialog>
+      <SubcartDialog
+        decreaseQuantity={decreaseQuantity}
+        increaseQuantity={increaseQuantity}
+        removeAllFromDepartment={removeAllFromDepartment}
+        removeFromCart={removeFromCart}
+        selectedSubCart={selectedSubCart}
+        setSubCartDialogVisible={setSubCartDialogVisible}
+        subCartDialogVisible={subCartDialogVisible}
+        updateSubCartDoctor={updateSubCartDoctor}
+      />
 
       {/* Footer */}
     </div>
