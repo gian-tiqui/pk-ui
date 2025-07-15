@@ -109,7 +109,7 @@ const DepartmentServices: React.FC<Props> = ({
                         </p>
                       )}
                     </div>
-                    <div className="ml-4 text-right">
+                    <div className="flex flex-col items-end ml-4 text-right">
                       <p className="mb-2 text-lg font-bold text-blue-600">
                         {service.currency}
                         {service.price.toLocaleString()}
