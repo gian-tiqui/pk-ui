@@ -86,12 +86,6 @@ type ChangePassword = {
   confirmNewPassword: string;
 };
 
-type Department = {
-  id: number;
-  name: string;
-  code: string;
-};
-
 type Question = {
   id: number;
   question: string;
@@ -131,12 +125,61 @@ type RoomImage = {
   imageLocation: string;
 };
 
+// For the OrderPage.tsx file
+// These types are used to define the structure of services, departments, and cart items
+
 type Item = {
   code: string;
   description: string;
 };
 
+interface Department {
+  id: number;
+  name: string;
+  code?: string;
+  icon: string;
+  serviceCount: number;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface Service {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+  departmentId: number;
+  departmentName: string;
+  isActive: boolean;
+  isPopular: boolean;
+  duration?: number;
+  requiresPreparation: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface CartItem extends Service {
+  quantity: number;
+  subtotal: number;
+}
+
+type SubCart = {
+  departmentId: number;
+  departmentName: string;
+  departmentIcon: string;
+  items: CartItem[];
+  totalItems: number;
+  totalAmount: number;
+  selectedDoctorId: number | null;
+  selectedDoctorName: string | null;
+};
+
 export type {
+  Service,
+  SubCart,
+  CartItem,
   Item,
   ArrowDimension,
   Route,
