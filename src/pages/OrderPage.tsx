@@ -22,6 +22,7 @@ import { ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import SubcartDialog from "../components/SubcartDialog";
 import DepartmentServices from "../components/DepartmentServices";
+import ReceiptDialog from "../components/ReceiptDialog";
 
 const OrderPage: React.FC = () => {
   const toastRef = useRef<Toast>(null);
@@ -31,6 +32,10 @@ const OrderPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedSubCart, setSelectedSubCart] = useState<SubCart | null>(null);
   const [subCartDialogVisible, setSubCartDialogVisible] = useState(false);
+  const [receiptDialogVisible, setReceiptDialogVisible] = useState(false);
+  const [receiptType, setReceiptType] = useState<"single" | "separated">(
+    "single"
+  );
   const [doctorSelections, setDoctorSelections] = useState<{
     [departmentId: number]: { doctorId: number; doctorName: string };
   }>({});
@@ -196,36 +201,19 @@ const OrderPage: React.FC = () => {
     );
 
     if (incompleteSubCarts.length > 0) {
-      alert("Please select a doctor for all departments in your cart.");
+      toastRef.current?.show({
+        severity: "warn",
+        summary: "Incomplete Selection",
+        detail: `Please select a doctor for the following departments:\n${incompleteSubCarts
+          .map((sc) => sc.departmentName)
+          .join(", ")}`,
+        life: 5000,
+      });
       return;
     }
 
-    const checkoutData = {
-      items: cartItems,
-      total: getTotalPrice(),
-      currency: "₱",
-      itemCount: getTotalItems(),
-      timestamp: new Date().toISOString(),
-      doctorsPerDepartment: currentSubCarts.map((subCart) => ({
-        departmentId: subCart.departmentId,
-        departmentName: subCart.departmentName,
-        doctorId: subCart.selectedDoctorId,
-        doctorName: subCart.selectedDoctorName,
-      })),
-    };
-
-    console.log("Proceeding to checkout with data:", checkoutData);
-    alert(
-      `Checkout initiated for ${getTotalItems()} items totaling ₱${getTotalPrice().toLocaleString()}\n\n` +
-        currentSubCarts
-          .map(
-            (sc) =>
-              `${sc.departmentName}: ${
-                sc.selectedDoctorName || "No doctor selected"
-              }`
-          )
-          .join("\n")
-    );
+    // Show receipt dialog instead of alert
+    setReceiptDialogVisible(true);
   };
 
   const handleSubCartClick = (subCart: SubCart) => {
@@ -306,24 +294,52 @@ const OrderPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen p-4 bg-gradient-to-br ice from-slate-50 via-blue-50 to-indigo-100">
-      <ConfirmDialog />
+      <ConfirmDialog
+        pt={{
+          root: {
+            className:
+              "rounded-3xl border border-white/20 backdrop-blur-sm bg-white/95 shadow-2xl overflow-hidden",
+          },
+          header: {
+            className:
+              "bg-gradient-to-br from-blue-500/10 to-indigo-600/10 border-b border-blue-500/20 p-6 rounded-t-3xl",
+          },
+          headerTitle: {
+            className: "font-bold text-xl text-blue-700 m-0",
+          },
+          closeButton: {
+            className:
+              "text-blue-500 bg-blue-500/10 hover:bg-blue-500/20 border-none rounded-full w-10 h-10 transition-all duration-300 hover:scale-110",
+          },
+          content: {
+            className: "p-6 bg-transparent",
+          },
+          message: {
+            className: "ml-4 text-base text-gray-700 leading-relaxed",
+          },
+          icon: {
+            className: "text-3xl text-amber-500",
+          },
+          footer: {
+            className:
+              "p-6 bg-slate-50/50 border-t border-slate-200/30 rounded-b-3xl flex justify-end gap-4",
+          },
+          acceptButton: {
+            className:
+              "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-none rounded-2xl px-6 py-3 font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg text-sm shadow-md",
+          },
+          rejectButton: {
+            className:
+              "bg-gray-500/10 hover:bg-gray-500/20 text-gray-700 hover:text-gray-900 border border-gray-500/30 rounded-2xl px-6 py-3 font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg text-sm",
+          },
+        }}
+      />
       <Toast ref={toastRef} />
       {/* Header */}
       <KioskHeader />
 
       {/* Main Content */}
       <main className="grid flex-1 grid-cols-4 gap-4">
-        {/* Departments or Services Section */}
-        <DepartmentServices
-          addToCart={addToCart}
-          departmentIcons={departmentIcons}
-          departments={departments}
-          getSelectedDepartmentIcon={getSelectedDepartmentName}
-          getSelectedDepartmentName={getSelectedDepartmentName}
-          getServicesForDepartment={getServicesForDepartment}
-          selectedDepartment={selectedDepartment}
-          setSelectedDepartment={setSelectedDepartment}
-        />
         {/* Popular Services */}
         <div className="p-6 text-white shadow-xl bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl h-[calc(100vh-105px)] flex flex-col">
           <h2 className="flex items-center mb-4 text-xl font-bold">
@@ -366,6 +382,18 @@ const OrderPage: React.FC = () => {
             ))}
           </div>
         </div>
+
+        {/* Departments or Services Section */}
+        <DepartmentServices
+          addToCart={addToCart}
+          departmentIcons={departmentIcons}
+          departments={departments}
+          getSelectedDepartmentIcon={getSelectedDepartmentName}
+          getSelectedDepartmentName={getSelectedDepartmentName}
+          getServicesForDepartment={getServicesForDepartment}
+          selectedDepartment={selectedDepartment}
+          setSelectedDepartment={setSelectedDepartment}
+        />
 
         {/* Cart Summary with SubCarts */}
         <div className="p-6 border shadow-xl bg-white/70 backdrop-blur-sm rounded-3xl border-white/20 h-[calc(100vh-105px)] flex flex-col">
@@ -477,7 +505,17 @@ const OrderPage: React.FC = () => {
         updateSubCartDoctor={updateSubCartDoctor}
       />
 
-      {/* Footer */}
+      {/* Receipt Dialog */}
+      <ReceiptDialog
+        visible={receiptDialogVisible}
+        onHide={() => setReceiptDialogVisible(false)}
+        cartItems={cartItems}
+        subCarts={getSubCarts()}
+        totalAmount={getTotalPrice()}
+        totalItems={getTotalItems()}
+        receiptType={receiptType}
+        onReceiptTypeChange={setReceiptType}
+      />
     </div>
   );
 };
