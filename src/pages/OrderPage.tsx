@@ -274,6 +274,18 @@ const OrderPage: React.FC = () => {
     setReceiptDialogVisible(true);
   };
 
+  const handleCheckoutClicked = () => {
+    confirmDialog({
+      message: "Are you sure you want to proceed to checkout?",
+      header: "Confirm Checkout",
+      icon: "pi pi-check",
+      accept: handleCheckout,
+      reject: () => {
+        // Do nothing on reject
+      },
+    });
+  };
+
   const handleSubCartClick = (subCart: SubCart) => {
     const currentSubCarts = getSubCarts();
     const currentSubCart = currentSubCarts.find(
@@ -547,7 +559,7 @@ const OrderPage: React.FC = () => {
                 </span>
               </div>
               <Button
-                onClick={handleCheckout}
+                onClick={handleCheckoutClicked}
                 className="justify-center w-full px-6 py-3 text-white transition-all duration-300 border-none shadow-lg bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl hover:from-emerald-600 hover:to-teal-700"
                 disabled={cartItems.length === 0}
               >
