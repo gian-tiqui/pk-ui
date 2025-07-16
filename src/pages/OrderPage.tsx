@@ -364,6 +364,7 @@ const OrderPage: React.FC = () => {
 
   const handleClearCart = () => {
     setCartItems([]);
+    setDoctorSelections({});
   };
 
   return (
